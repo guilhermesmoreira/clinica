@@ -1,0 +1,31 @@
+.button_example{    
+    margin: 1rem 0;
+    color: #ffffff;    
+    border-radius: 0.5rem;
+    border: none;
+    outline: nome;   
+
+}
+
+.orange {
+    background-color: #e7540f;
+}
+
+.blue {
+    background-color: #0f13e7;
+}
+
+.small {
+    padding: 1rem 2rem;
+    font-size: 1rem;
+}
+
+.medium {
+    padding: 2rem 4rem;
+    font-size: 2rem;
+}
+
+.large {
+    padding: 4rem 8rem;
+    font-size: 4rem;
+}

@@ -1,0 +1,69 @@
+/* _clinica.module.css */
+
+.container {
+    display: flex;
+    height: 100vh;  /* Isso garante que o container ocupe toda a altura da tela */
+}
+
+.leftColumn {
+    width: 200px;  /* Define a largura da coluna da esquerda */
+    background-color: #f4f4f4;  /* Cor de fundo para a coluna */
+    padding: 20px;
+    display: flex;
+    flex-direction: column;  /* Organiza o conteúdo na coluna */
+    align-items: center;  /* Centraliza os itens */
+    justify-content: flex-start;  /* Alinha os itens ao topo */
+    font-size: 20px;
+    border-right: 2px solid #ccc; /* Linha divisória entre as colunas */
+    height: 100%;  /* Garante que a coluna ocupe toda a altura da tela */
+}
+
+.leftColumn a {
+    text-decoration: none;
+    color: #000;
+    font-weight: bold;
+    margin-bottom: 20px; /* Espaço entre "Home" e o botão */
+}
+
+.addButton, .removeButton {
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #4cad4f;  
+    color: rgb(0, 0, 0);
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 20px;  
+}
+
+.selectProcedimento {
+    margin: 10px;
+    height: 30px;
+    width: 210px;
+  }
+
+  .selectedPaciente {
+    margin: 10px;
+    height: 30px;
+    width: 210px;
+  }
+
+.addButton, .removeButton:hover {
+    background-color: #2b852f;  /* Escurece o botão quando passa o mouse */
+}
+
+.rightColumn {
+    flex: 1;  /* Faz com que a coluna da direita ocupe o restante do espaço */
+    display: flex;
+    flex-direction: row;  /* Alinha os cards na direção da coluna */
+    align-items: flex-start;  /* Alinha os cards à esquerda */
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.searchInput {
+    margin: 10px;
+    height: 25px;
+    width: 200px;
+}
+

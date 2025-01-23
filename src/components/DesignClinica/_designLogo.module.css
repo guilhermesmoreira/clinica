@@ -1,0 +1,19 @@
+.logoBox {
+    display: flex;
+    justify-content: center; /* Centraliza horizontalmente */
+    align-items: center; /* Centraliza verticalmente dentro da box */
+    margin: 0.4rem 0; /* Espaço entre a logo e o restante do conteúdo */
+    padding: 1rem;
+    background-color: #707070; /* Cor de fundo suave para a caixa */
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra suave */
+    /* position: sticky; Torna a logo fixa no topo */
+    top: 0; /* Fixa no topo da tela */
+    z-index: 1000; /* Garante que fique acima de outros elementos */
+}
+
+.logo {
+    max-width: 100rem; /* Largura máxima para o logo */
+    max-height: 100rem; /* Altura máxima para o logo */
+    object-fit: fill; /* Mantém as proporções do logo */
+}

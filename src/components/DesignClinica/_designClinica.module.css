@@ -1,0 +1,88 @@
+.wrapper{     
+    width: 550px;
+    height: 20rem;
+    padding: 1rem;
+    margin: 1rem;
+    margin-bottom: 0;
+    background-color: rgb(180, 215, 248);
+    color: #000000;
+    border-radius: 0.5rem;
+    border: 1px solid rgb(42, 48, 54);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.8); /* Sombra para destaque */    
+}
+
+.cabecalho {
+    display: flex;
+}
+
+.header{
+    display: flex;
+    width: 60%;
+    height: 5%;
+    padding: 10px;
+    border: 2px solid #000; /* Define a borda */
+    border-radius: 1rem; 
+    align-items: center;
+    justify-content: space-between; /* Alinha as divs nas extremidades */
+}
+
+.saldo{
+    width: 40%;
+    height: 5%;
+    padding: 10px;
+    margin-left: 10px;
+    border: 2px solid #000; /* Define a borda */
+    border-radius: 1rem; 
+    align-items: left;
+    display: flex;    
+    justify-content: flex-start; 
+    
+}
+
+.procedimento{    
+    height: 30%;    
+    border: 2px solid #000; /* Define a borda */
+    border-radius: 1rem; 
+    align-items: center;
+    padding: 0px 10px;       
+    
+}
+
+.row{
+    display: flex;
+    justify-content: space-around;
+
+}
+
+.row div {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.agendamento {
+    width: auto;
+    height: 30%;    
+    border: 2px solid #000; /* Define a borda */
+    border-radius: 1rem; 
+    align-items: center;
+    padding: 10px;   
+}
+
+.execucao {
+    width: auto;
+    height: 35%;    
+    border: 2px solid #000; /* Define a borda */
+    border-radius: 1rem; 
+    align-items: center;
+    padding: 10px;   
+}
+
+.pagamento {
+    height: 40%;    
+    border: 2px solid #000; /* Define a borda */
+    border-radius: 1rem; 
+    align-items: center;
+    padding: 10px;   
+}
