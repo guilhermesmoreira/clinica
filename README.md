@@ -1,70 +1,151 @@
-# Getting Started with Create React App
+Documentação do Aplicativo React para Clínica Odontológica
+Visão Geral
+Este documento descreve a estrutura e funcionalidades de um aplicativo React que consome uma API pronta de uma clínica odontológica. O aplicativo permite o gerenciamento de agendamentos, procedimentos, condições de pacientes e acompanhamento financeiro. A interface é baseada em cartões que representam procedimentos, com funcionalidades de destaque, cores indicativas de status e fluxos de trabalho personalizáveis.
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Funcionalidades Principais
+1. Tela Home
+A tela inicial exibe colunas e cartões que representam procedimentos agendados ou em andamento. Cada cartão contém informações relevantes sobre o paciente, procedimentos, status financeiro e condições especiais.
 
-## Available Scripts
+Período Vigente:
 
-In the project directory, you can run:
+Exibe um período de aproximadamente um mês (duas semanas para trás e três para frente).
 
-### `npm start`
+A data atual é destacada com uma cor diferente.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+O período é editável, permitindo ajustes conforme a necessidade.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+Balanço:
 
-### `npm test`
+Exibe totais financeiros no canto superior direito:
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+TOTAL: Valor total do orçamento.
 
-### `npm run build`
+ENTRADAS: Valor já pago pelo paciente.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+PROGRAMADO: Valor planejado para procedimentos agendados.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+ENTREGUE: Valor correspondente aos procedimentos já realizados.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+Botão "Adicionar Planejamento":
 
-### `npm run eject`
+Abre um modal para criar novos agendamentos ou procedimentos.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+2. Cartões de Procedimentos
+Cada cartão representa um ou mais procedimentos e possui as seguintes características:
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+Status Visual:
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+Acinzentado: Quando uma data é selecionada, o cartão fica acinzentado e é movido para o final da lista, mas ainda visível.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+Colorido: Na data selecionada, o cartão volta à cor original e pode piscar (highlight na borda) para indicar que as secretárias devem realizar o agendamento.
 
-## Learn More
+Cores de Saldo:
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+Verde: Saldo suficiente para liberar o procedimento.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+Laranja: Procedimento agendado sem saldo suficiente (o valor do procedimento excede o saldo disponível).
 
-### Code Splitting
+Vermelho: Saldo insuficiente para realizar o agendamento.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+Azul: Tratamento concluído. Se o valor do orçamento for alto, o sistema sugere agendar uma "Consulta de Alta".
 
-### Analyzing the Bundle Size
+3. Modal de Adicionar Planejamento
+Ao clicar no botão "Adicionar Planejamento", um modal é exibido sobre a tela inicial, com fundo escurecido. O modal contém os seguintes campos:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+Selecionar Paciente: Lista de pacientes cadastrados.
 
-### Making a Progressive Web App
+Selecionar Tratamentos: Um ou mais tratamentos podem ser selecionados para o paciente.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+Atribuir Condição:
 
-### Advanced Configuration
+Condições pré-definidas (ex.: "Troca de Protocolo", "Paciente não sobe escadas").
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+Condições podem adicionar tempo adicional aos procedimentos (ex.: +15 minutos por sessão).
 
-### Deployment
+Condições também podem ser apenas alertas para o agendamento.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+Criação de Cartões:
 
-### `npm run build` fails to minify
+Cada cartão representa um ou mais procedimentos.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+O tempo de execução é calculado automaticamente com base no tempo BASE do procedimento + tempo variável (dependendo da quantidade de dentes ou outros fatores).
+
+O tempo relacionado à condição do paciente é adicionado ao cálculo.
+
+4. Botão de Configuração
+Um botão com um ponto de interrogação (?) abre as configurações do sistema:
+
+Setup de Etapas:
+
+Permite criar e configurar etapas para os procedimentos.
+
+Cada etapa tem um nome e um tempo de execução.
+
+Setup de Limiar de Valor para Consulta de Alta:
+
+Define um valor de orçamento a partir do qual a "Consulta de Alta" é sugerida automaticamente.
+
+O checkbox de "Consulta de Alta" pode ser marcado ou desmarcado manualmente.
+
+Tabelas de Preço:
+
+Exibe uma tabela de preços vinculada ao sistema.
+
+Permite configurar múltiplas tabelas de preço.
+
+Em cada tabela, é possível criar etapas com nomes e tempos de execução.
+
+Fluxo de Trabalho
+Criação de Cartões:
+
+O usuário seleciona um paciente, procedimentos e condições.
+
+O sistema calcula automaticamente o tempo de execução com base nos procedimentos e condições.
+
+O cartão é criado e exibido na tela inicial.
+
+Agendamento:
+
+O usuário seleciona uma data para o procedimento.
+
+O cartão fica acinzentado e é movido para o final da lista.
+
+Na data selecionada, o cartão volta à cor original e pode piscar para indicar que o agendamento deve ser realizado.
+
+Acompanhamento Financeiro:
+
+O sistema verifica o saldo do paciente e atualiza as cores dos cartões conforme o status financeiro.
+
+Se o tratamento for concluído e o valor do orçamento for alto, o sistema sugere agendar uma "Consulta de Alta".
+
+Configurações:
+
+O usuário pode configurar etapas, condições e tabelas de preço.
+
+O tempo de execução é calculado automaticamente com base nas configurações.
+
+Estrutura do Projeto em React
+1. Componentes Principais
+HomeScreen: Tela inicial com colunas, cartões e balanço financeiro.
+
+CardComponent: Componente que representa um cartão de procedimento.
+
+AddPlanningModal: Modal para adicionar novos planejamentos.
+
+SettingsScreen: Tela de configurações para etapas, condições e tabelas de preço.
+
+2. Gerenciamento de Estado
+Redux ou Context API: Para gerenciar o estado global, como pacientes, procedimentos, agendamentos e configurações.
+
+3. Integração com API
+Axios ou Fetch: Para consumir a API da clínica odontológica e buscar/atualizar dados.
+
+4. Bibliotecas de UI
+Material-UI ou Ant Design: Para criar uma interface moderna e responsiva.
+
+React-Modal: Para exibir o modal de adicionar planejamento.
+
+5. Lógica de Negócio
+Cálculo de Tempo: Funções para calcular o tempo de execução com base nos procedimentos e condições.
+
+Verificação de Saldo: Funções para verificar o saldo do paciente e atualizar as cores dos cartões.
