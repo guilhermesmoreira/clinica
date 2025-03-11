@@ -12,6 +12,7 @@ const Topbar = ({
   toDate,
   setToDate,
   balanceData,
+  onAddCard,
 }) => {
   // Função para atualizar o período com base na data selecionada
   const handleDateChange = (e) => {
@@ -50,7 +51,11 @@ const Topbar = ({
       </div>
 
       <div className={styles.actions}>
-        <Button variant="primary" className={styles.iconButton}>
+      <Button
+          variant="primary"
+          className={styles.iconButton}
+          onClick={onAddCard} // Chama a função para adicionar card
+        >
           <Plus size={20} />
         </Button>
         <Button variant="secondary" className={styles.iconButton}>
