@@ -18,13 +18,33 @@ const Home = () => {
     entregue: 5000,
   });
 
-  const [columns, setColumns] = useState([{ id: 1, cards: [] }]);
-  const [cards, setCards] = useState([]);
-  const [nextCardId, setNextCardId] = useState(1);
+  const [columns, setColumns] = useState([{ id: 1, title: "Coluna 1" }]);
+  const [cards, setCards] = useState([
+    {
+      id: 1,
+      column: 1,
+      content: {
+        ID: "250550",
+        paciente: "Nome do paciente",
+        procedimento: "Procedimento (Como é visto na tabela de procedimentos)",
+        etapas: [
+          { etapa: "Etapa 1 [30min]", concluida: false },
+          { etapa: "Etapa 2 [45min]", concluida: false },
+        ],
+        agendamento: {
+          agendar: "Agendar",
+          proximoAgendado: "20/01/25",
+        },
+        saldo: "R$ 2000/3000",
+        status: "verde",
+      },
+    },
+  ]);
+  const [nextCardId, setNextCardId] = useState(2);
   const [nextColumnId, setNextColumnId] = useState(2);
 
   const addColumn = () => {
-    setColumns([...columns, { id: nextColumnId, cards: [] }]);
+    setColumns([...columns, { id: nextColumnId, title: `Coluna ${nextColumnId}` }]);
     setNextColumnId(nextColumnId + 1);
   };
 
@@ -32,8 +52,10 @@ const Home = () => {
     const confirmDelete = window.confirm("Tem certeza que deseja deletar esta coluna?");
     if (confirmDelete && columns.length > 1) {
       setColumns(columns.filter((column) => column.id !== columnId));
+      setCards(cards.filter((card) => card.column !== columnId));
     }
   };
+
   const addCard = (columnId) => {
     const newCard = {
       id: nextCardId,
@@ -51,7 +73,7 @@ const Home = () => {
           proximoAgendado: "20/01/25",
         },
         saldo: "R$ 2000/3000",
-        status: "verde", // Pode ser "verde", "laranja", "vermelho" ou "azul"
+        status: "verde",
       },
     };
 
@@ -96,8 +118,8 @@ const Home = () => {
     const card = cards.find((card) => card.id.toString() === draggableId);
     const newCards = cards.filter((card) => card.id.toString() !== draggableId);
 
-    card.column = parseInt(destination.droppableId);
-    newCards.splice(destination.index, 0, card);
+    const updatedCard = { ...card, column: parseInt(destination.droppableId) };
+    newCards.splice(destination.index, 0, updatedCard);
 
     setCards(newCards);
   };
@@ -128,7 +150,7 @@ const Home = () => {
                       className={styles.column}
                     >
                       <div className={styles.columnHeader}>
-                        <h3>Coluna {column.id}</h3>
+                        <h3>{column.title}</h3>
                         {columns.length > 1 && (
                           <Button
                             variant="danger"
