@@ -16,24 +16,25 @@ const Home = () => {
     programado: 12000,
     entregue: 5000,
   });
-  const [columns, setColumns] = useState([{ id: 1, title: "Coluna 1" }]);
-  const [cards, setCards] = useState([]); // Estado inicial sem cards
-  const [nextCardId, setNextCardId] = useState(1); // Começa com 1
+  const [columns, setColumns] = useState([
+    { id: 1, title: "Coluna 1", color: "linear-gradient(45deg, #f3f4f6, #e5e7eb, #f3f4f6)" }, // Gradiente inicial
+  ]);
+  const [cards, setCards] = useState([]);
+  const [nextCardId, setNextCardId] = useState(1);
   const [nextColumnId, setNextColumnId] = useState(2);
+  const [isColorModalOpen, setIsColorModalOpen] = useState(false);
+  const [currentColumnId, setCurrentColumnId] = useState(null);
 
-  // Função para atualizar as datas quando a selectedDate muda
   const updateDateRange = (newSelectedDate) => {
     setSelectedDate(newSelectedDate);
-    setFromDate(subDays(newSelectedDate, 14)); // Duas semanas antes
-    setToDate(addDays(newSelectedDate, 14)); // Duas semanas depois
+    setFromDate(subDays(newSelectedDate, 14));
+    setToDate(addDays(newSelectedDate, 14));
   };
 
-  // Função para modificar manualmente a selectedDate
   const handleSelectedDateChange = (date) => {
     updateDateRange(date);
   };
 
-  // Função para modificar manualmente a toDate
   const handleToDateChange = (date) => {
     setToDate(date);
   };
@@ -41,7 +42,7 @@ const Home = () => {
   const addColumn = () => {
     setColumns([
       ...columns,
-      { id: nextColumnId, title: `Coluna ${nextColumnId}` },
+      { id: nextColumnId, title: `Coluna ${nextColumnId}`, color: "linear-gradient(45deg, #f3f4f6, #e5e7eb, #f3f4f6)" }, // Gradiente inicial
     ]);
     setNextColumnId(nextColumnId + 1);
   };
@@ -54,6 +55,39 @@ const Home = () => {
       setColumns(columns.filter((column) => column.id !== columnId));
       setCards(cards.filter((card) => card.column !== columnId));
     }
+  };
+
+  const editColumnTitle = (columnId, newTitle) => {
+    setColumns(
+      columns.map((column) =>
+        column.id === columnId ? { ...column, title: newTitle } : column
+      )
+    );
+  };
+
+  const changeColumnColor = (columnId, newColor) => {
+    setColumns(
+      columns.map((column) =>
+        column.id === columnId ? { ...column, color: newColor } : column
+      )
+    );
+  };
+
+  const openColorModal = (columnId) => {
+    setCurrentColumnId(columnId);
+    setIsColorModalOpen(true);
+  };
+
+  const closeColorModal = () => {
+    setIsColorModalOpen(false);
+    setCurrentColumnId(null);
+  };
+
+  const handleColorSelect = (color) => {
+    if (currentColumnId) {
+      changeColumnColor(currentColumnId, color);
+    }
+    closeColorModal();
   };
 
   const addCard = (columnId) => {
@@ -130,6 +164,39 @@ const Home = () => {
     setCards(newCards);
   };
 
+  const ColorModal = ({ isOpen, onClose, onSelectColor }) => {
+    if (!isOpen) return null;
+
+    const colors = [
+      "linear-gradient(45deg, #4CAF50, #A5D6A7, #4CAF50)", // Verde Metálico
+      "linear-gradient(45deg, #FF5252, #FF8A80, #FF5252)", // Vermelho Metálico
+      "linear-gradient(45deg, #2196F3, #90CAF9, #2196F3)", // Azul Metálico
+      "linear-gradient(45deg, #FFFFFF, #E0E0E0, #FFFFFF)", // Branco Metálico
+      "linear-gradient(45deg, #000000, #424242, #000000)", // Preto Metálico
+    ];
+
+    return (
+      <div className={styles.modalOverlay}>
+        <div className={styles.modalContent}>
+          <h3>Escolha uma cor</h3>
+          <div className={styles.colorOptions}>
+            {colors.map((color, index) => (
+              <button
+                key={index}
+                className={styles.colorButton}
+                style={{ background: color }}
+                onClick={() => onSelectColor(color)}
+              />
+            ))}
+          </div>
+          <button onClick={onClose} className={styles.closeButton}>
+            Fechar
+          </button>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className={styles.container}>
       <Topbar
@@ -140,7 +207,7 @@ const Home = () => {
         toDate={toDate}
         setToDate={setToDate}
         balanceData={balanceData}
-        onAddCard={() => addCard(columns[0].id)} // Adiciona um card na primeira coluna
+        onAddCard={() => addCard(columns[0].id)}
       />
 
       <div className={styles.content}>
@@ -154,19 +221,37 @@ const Home = () => {
                       ref={provided.innerRef}
                       {...provided.droppableProps}
                       className={styles.column}
+                      style={{ background: column.color }} // Aplica o gradiente
                     >
                       <div className={styles.columnHeader}>
-                        <h3>{column.title}</h3>
-                        {columns.length > 1 && (
+                        <input
+                          type="text"
+                          value={column.title}
+                          onChange={(e) => editColumnTitle(column.id, e.target.value)}
+                          className={`${styles.columnTitleInput} ${
+                            column.color.includes("#000000") ? styles.whiteText : ""
+                          }`} // Condicional para texto branco
+                        />
+                        <div>
                           <Button
-                            variant="danger"
+                            variant="outline"
                             size="sm"
-                            onClick={() => deleteColumn(column.id)}
-                            className={styles.deleteButton}
+                            onClick={() => openColorModal(column.id)}
+                            className={styles.colorButton}
                           >
-                            <Trash size={16} />
+                            🎨
                           </Button>
-                        )}
+                          {columns.length > 1 && (
+                            <Button
+                              variant="danger"
+                              size="sm"
+                              onClick={() => deleteColumn(column.id)}
+                              className={styles.deleteButton}
+                            >
+                              <Trash size={16} />
+                            </Button>
+                          )}
+                        </div>
                       </div>
 
                       <div className={styles.cards}>
@@ -269,6 +354,12 @@ const Home = () => {
           </div>
         </DragDropContext>
       </div>
+
+      <ColorModal
+        isOpen={isColorModalOpen}
+        onClose={closeColorModal}
+        onSelectColor={handleColorSelect}
+      />
     </div>
   );
 };
