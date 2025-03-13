@@ -10,46 +10,46 @@ const Home = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [fromDate, setFromDate] = useState(subDays(new Date(), 14));
   const [toDate, setToDate] = useState(addDays(new Date(), 14));
-
   const [balanceData, setBalanceData] = useState({
     total: 15000,
     entradas: 8000,
     programado: 12000,
     entregue: 5000,
   });
-
   const [columns, setColumns] = useState([{ id: 1, title: "Coluna 1" }]);
-  const [cards, setCards] = useState([
-    {
-      id: 1,
-      column: 1,
-      content: {
-        ID: "250550",
-        paciente: "Nome do paciente",
-        procedimento: "Procedimento (Como é visto na tabela de procedimentos)",
-        etapas: [
-          { etapa: "Etapa 1 [30min]", concluida: false },
-          { etapa: "Etapa 2 [45min]", concluida: false },
-        ],
-        agendamento: {
-          agendar: "Agendar",
-          proximoAgendado: "20/01/25",
-        },
-        saldo: "R$ 2000/3000",
-        status: "verde",
-      },
-    },
-  ]);
-  const [nextCardId, setNextCardId] = useState(2);
+  const [cards, setCards] = useState([]); // Estado inicial sem cards
+  const [nextCardId, setNextCardId] = useState(1); // Começa com 1
   const [nextColumnId, setNextColumnId] = useState(2);
 
+  // Função para atualizar as datas quando a selectedDate muda
+  const updateDateRange = (newSelectedDate) => {
+    setSelectedDate(newSelectedDate);
+    setFromDate(subDays(newSelectedDate, 14)); // Duas semanas antes
+    setToDate(addDays(newSelectedDate, 14)); // Duas semanas depois
+  };
+
+  // Função para modificar manualmente a selectedDate
+  const handleSelectedDateChange = (date) => {
+    updateDateRange(date);
+  };
+
+  // Função para modificar manualmente a toDate
+  const handleToDateChange = (date) => {
+    setToDate(date);
+  };
+
   const addColumn = () => {
-    setColumns([...columns, { id: nextColumnId, title: `Coluna ${nextColumnId}` }]);
+    setColumns([
+      ...columns,
+      { id: nextColumnId, title: `Coluna ${nextColumnId}` },
+    ]);
     setNextColumnId(nextColumnId + 1);
   };
 
   const deleteColumn = (columnId) => {
-    const confirmDelete = window.confirm("Tem certeza que deseja deletar esta coluna?");
+    const confirmDelete = window.confirm(
+      "Tem certeza que deseja deletar esta coluna?"
+    );
     if (confirmDelete && columns.length > 1) {
       setColumns(columns.filter((column) => column.id !== columnId));
       setCards(cards.filter((card) => card.column !== columnId));
@@ -61,7 +61,7 @@ const Home = () => {
       id: nextCardId,
       column: columnId,
       content: {
-        ID: "250550",
+        ID: "200000",
         paciente: "Nome do paciente",
         procedimento: "Procedimento (Como é visto na tabela de procedimentos)",
         etapas: [
@@ -82,7 +82,9 @@ const Home = () => {
   };
 
   const deleteCard = (cardId) => {
-    const confirmDelete = window.confirm("Tem certeza que deseja deletar este card?");
+    const confirmDelete = window.confirm(
+      "Tem certeza que deseja deletar este card?"
+    );
     if (confirmDelete) {
       setCards(cards.filter((card) => card.id !== cardId));
     }
@@ -111,7 +113,11 @@ const Home = () => {
   const onDragEnd = (result) => {
     const { destination, source, draggableId } = result;
 
-    if (!destination || (destination.droppableId === source.droppableId && destination.index === source.index)) {
+    if (
+      !destination ||
+      (destination.droppableId === source.droppableId &&
+        destination.index === source.index)
+    ) {
       return;
     }
 
@@ -134,7 +140,7 @@ const Home = () => {
         toDate={toDate}
         setToDate={setToDate}
         balanceData={balanceData}
-        onAddCard={() => addCard(columns[0].id)}
+        onAddCard={() => addCard(columns[0].id)} // Adiciona um card na primeira coluna
       />
 
       <div className={styles.content}>
@@ -191,26 +197,52 @@ const Home = () => {
                                           <Trash size={16} />
                                         </Button>
                                       </div>
-                                      <p><strong>ID:</strong> {card.content.ID}</p>
-                                      <p><strong>Paciente:</strong> {card.content.paciente}</p>
-                                      <p><strong>Procedimento:</strong> {card.content.procedimento}</p>
+                                      <p>
+                                        <strong>ID:</strong> {card.content.ID}
+                                      </p>
+                                      <p>
+                                        <strong>Paciente:</strong>{" "}
+                                        {card.content.paciente}
+                                      </p>
+                                      <p>
+                                        <strong>Procedimento:</strong>{" "}
+                                        {card.content.procedimento}
+                                      </p>
                                       <div className={styles.etapas}>
                                         <strong>Etapas:</strong>
-                                        {card.content.etapas.map((etapa, index) => (
-                                          <div key={index}>
-                                            <input
-                                              type="checkbox"
-                                              checked={etapa.concluida}
-                                              onChange={() => toggleEtapa(card.id, index)}
-                                            />
-                                            {etapa.etapa}
-                                          </div>
-                                        ))}
+                                        {card.content.etapas.map(
+                                          (etapa, index) => (
+                                            <div key={index}>
+                                              <input
+                                                type="checkbox"
+                                                checked={etapa.concluida}
+                                                onChange={() =>
+                                                  toggleEtapa(card.id, index)
+                                                }
+                                              />
+                                              {etapa.etapa}
+                                            </div>
+                                          )
+                                        )}
                                       </div>
-                                      <p><strong>Agendamento:</strong> {card.content.agendamento.agendar}</p>
-                                      <p><strong>Próximo agendado:</strong> {card.content.agendamento.proximoAgendado}</p>
-                                      <p><strong>Saldo:</strong> {card.content.saldo}</p>
-                                      <p className={`${styles.status} ${card.content.status}`}>
+                                      <p>
+                                        <strong>Agendamento:</strong>{" "}
+                                        {card.content.agendamento.agendar}
+                                      </p>
+                                      <p>
+                                        <strong>Próximo agendado:</strong>{" "}
+                                        {
+                                          card.content.agendamento
+                                            .proximoAgendado
+                                        }
+                                      </p>
+                                      <p>
+                                        <strong>Saldo:</strong>{" "}
+                                        {card.content.saldo}
+                                      </p>
+                                      <p
+                                        className={`${styles.status} ${card.content.status}`}
+                                      >
                                         Status: {card.content.status}
                                       </p>
                                     </Card.Body>
