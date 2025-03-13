@@ -142,3 +142,74 @@
 .deleteButton:hover {
   background-color: #cc0000;
 }
+
+.columnTitleInput {
+  border: none;
+  background: transparent;
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: #333;
+  margin-right: 0.5rem;
+  flex-grow: 1;
+}
+
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modalContent {
+  background-color: white;
+  padding: 2rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.colorOptions {
+  display: flex;
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.colorButton {
+  width: 30px;
+  height: 30px;
+  margin-right: 5px;
+  border: 2px solid #ccc;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.colorButton:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
+}
+
+.closeButton {
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  background-color: #ff4444;
+  color: white;
+  border: none;
+  border-radius: 0.25rem;
+  cursor: pointer;
+}
+
+.closeButton:hover {
+  background-color: #cc0000;
+}
+
+.whiteText {
+  color: white !important; /* Força o texto a ser branco */
+}
