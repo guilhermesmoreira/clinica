@@ -17,8 +17,7 @@
   display: flex;
   align-items: flex-start;
   gap: 1rem;
-  overflow: hidden;
-  /* Removido overflow: hidden */
+  position: relative;
 }
 
 .columns {
@@ -208,4 +207,20 @@
 
 .whiteText {
   color: white !important;
+}
+
+.connectionSvg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.connectionLine {
+  stroke: red;
+  stroke-width: 2px;
+  stroke-dasharray: 5, 5;
 }

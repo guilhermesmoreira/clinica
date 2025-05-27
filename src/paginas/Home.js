@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Button, Card, Form, Modal } from "react-bootstrap";
 import { Plus, Trash } from "react-bootstrap-icons";
 import { addDays, subDays, format } from "date-fns";
 import styles from "./Home.module.css";
 import Topbar from "../components/Topbar/Topbar";
+import axios from "axios";
 
 const Home = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -16,7 +17,11 @@ const Home = () => {
     entregue: 5000,
   });
   const [columns, setColumns] = useState([
-    { id: 1, title: "Coluna 1", color: "linear-gradient(45deg, #f3f4f6, #e5e7eb, #f3f4f6)" },
+    {
+      id: 1,
+      title: "Etapa 1",
+      color: "linear-gradient(45deg, #f3f4f6, #e5e7eb, #f3f4f6)",
+    },
   ]);
   const [cards, setCards] = useState([]);
   const [nextCardId, setNextCardId] = useState(1);
@@ -25,36 +30,73 @@ const Home = () => {
   const [isAddCardModalOpen, setIsAddCardModalOpen] = useState(false);
   const [currentColumnId, setCurrentColumnId] = useState(null);
   const [newCardData, setNewCardData] = useState({
-    columnId: columns[0].id,
     paciente: "",
-    procedimento: "",
-    etapas: [],
-    agendamento: {
-      agendar: "Agendar",
-      dataAgendada: null,
-    },
-    saldo: "R$ 2000/3000",
-    status: "verde",
+    procedimentos: [{ procedimento: "", columnId: columns[0].id }],
   });
+  const [nextBatchId, setNextBatchId] = useState(1);
+  const [cardPositions, setCardPositions] = useState({});
+  const cardRefs = useRef({});
+  const containerRef = useRef(null);
 
-  const updateDateRange = (newSelectedDate) => {
-    setSelectedDate(newSelectedDate);
-    setFromDate(subDays(newSelectedDate, 14));
-    setToDate(addDays(newSelectedDate, 14));
+  const updateCardPositions = () => {
+    if (!containerRef.current) return;
+    const containerRect = containerRef.current.getBoundingClientRect();
+    const positions = {};
+    Object.keys(cardRefs.current).forEach((cardId) => {
+      const element = cardRefs.current[cardId];
+      if (element) {
+        const rect = element.getBoundingClientRect();
+        positions[cardId] = {
+          startX: rect.right - containerRect.left,
+          startY: rect.top + rect.height / 2 - containerRect.top,
+          endX: rect.left - containerRect.left,
+          endY: rect.top + rect.height / 2 - containerRect.top,
+        };
+      }
+    });
+    setCardPositions(positions);
   };
+  const [procedimentosDisponiveis, setProcedimentosDisponiveis] = useState([]);
+  const [filtroProcedimento, setFiltroProcedimento] = useState("");
 
-  const handleSelectedDateChange = (date) => {
-    updateDateRange(date);
-  };
+  useEffect(() => {
+    const fetchProcedimentos = async () => {
+      try {
+        const response = await axios.get("http://localhost:8000/procedimentos");
+        const rawData = response.data;
 
-  const handleToDateChange = (date) => {
-    setToDate(date);
-  };
+        const procedimentosArray = Object.values(rawData)
+          .flat()
+          .filter((p) => p && typeof p === "object" && p.ProcedureName);
+
+        setProcedimentosDisponiveis(procedimentosArray);
+      } catch (error) {
+        console.error("Erro ao buscar procedimentos da Clinicorp:", error);
+      }
+    };
+    fetchProcedimentos();
+  }, []);
+
+
+  useEffect(() => {
+    updateCardPositions();
+    const handleResizeOrScroll = () => updateCardPositions();
+    window.addEventListener("resize", handleResizeOrScroll);
+    window.addEventListener("scroll", handleResizeOrScroll);
+    return () => {
+      window.removeEventListener("resize", handleResizeOrScroll);
+      window.removeEventListener("scroll", handleResizeOrScroll);
+    };
+  }, [cards]);
 
   const addColumn = () => {
     setColumns([
       ...columns,
-      { id: nextColumnId, title: `Coluna ${nextColumnId}`, color: "linear-gradient(45deg, #f3f4f6, #e5e7eb, #f3f4f6)" },
+      {
+        id: nextColumnId,
+        title: `Etapa ${nextColumnId}`,
+        color: "linear-gradient(45deg, #f3f4f6, #e5e7eb, #f3f4f6)",
+      },
     ]);
     setNextColumnId(nextColumnId + 1);
   };
@@ -107,39 +149,70 @@ const Home = () => {
   const closeAddCardModal = () => {
     setIsAddCardModalOpen(false);
     setNewCardData({
-      columnId: columns[0].id,
       paciente: "",
-      procedimento: "",
-      etapas: [],
-      agendamento: {
-        agendar: "Agendar",
-        dataAgendada: null,
-      },
-      saldo: "R$ 2000/3000",
-      status: "verde",
+      procedimentos: [{ procedimento: "", columnId: columns[0].id }],
     });
   };
 
+  const addNewProcedimento = () => {
+    setNewCardData({
+      ...newCardData,
+      procedimentos: [
+        ...newCardData.procedimentos,
+        { procedimento: "", columnId: columns[0].id },
+      ],
+    });
+  };
+
+  const updateProcedimento = (index, field, value) => {
+    const updatedProcedimentos = newCardData.procedimentos.map((proc, i) =>
+      i === index ? { ...proc, [field]: value } : proc
+    );
+    setNewCardData({ ...newCardData, procedimentos: updatedProcedimentos });
+  };
+
+  const removeProcedimento = (index) => {
+    if (newCardData.procedimentos.length > 1) {
+      setNewCardData({
+        ...newCardData,
+        procedimentos: newCardData.procedimentos.filter((_, i) => i !== index),
+      });
+    }
+  };
+
   const handleAddCard = () => {
-    const newCard = {
-      id: nextCardId,
-      column: newCardData.columnId,
+    if (
+      !newCardData.paciente ||
+      newCardData.procedimentos.some((proc) => !proc.procedimento)
+    ) {
+      alert("Por favor, preencha o paciente e todos os procedimentos.");
+      return;
+    }
+    const currentBatchId = nextBatchId;
+    const newCards = newCardData.procedimentos.map((proc, index) => ({
+      id: nextCardId + index,
+      column: proc.columnId,
+      batchId: currentBatchId,
       content: {
-        ID: `20000${nextCardId}`,
+        ID: `${nextCardId + index}`,
         paciente: newCardData.paciente,
-        procedimento: newCardData.procedimento,
+        procedimento: proc.procedimento,
         etapas: [
           { etapa: "Etapa 1 [30min]", concluida: false },
           { etapa: "Etapa 2 [45min]", concluida: false },
         ],
-        agendamento: newCardData.agendamento,
-        saldo: newCardData.saldo,
-        status: newCardData.status,
+        agendamento: {
+          agendar: "Agendar",
+          dataAgendada: null,
+        },
+        saldo: "R$ 2000/3000",
+        status: "verde",
       },
-    };
+    }));
 
-    setCards([...cards, newCard]);
-    setNextCardId(nextCardId + 1);
+    setCards([...cards, ...newCards]);
+    setNextCardId(nextCardId + newCards.length);
+    setNextBatchId(nextBatchId + 1);
     closeAddCardModal();
   };
 
@@ -155,16 +228,14 @@ const Home = () => {
       cards.map((card) =>
         card.id === cardId
           ? {
-              ...card,
-              content: {
-                ...card.content,
-                etapas: card.content.etapas.map((etapa, index) =>
-                  index === etapaIndex
-                    ? { ...etapa, concluida: !etapa.concluida }
-                    : etapa
-                ),
-              },
-            }
+            ...card,
+            content: {
+              ...card.content,
+              etapas: card.content.etapas.map((etapa, index) =>
+                index === etapaIndex ? { ...etapa, concluida: !etapa.concluida } : etapa
+              ),
+            },
+          }
           : card
       )
     );
@@ -176,15 +247,15 @@ const Home = () => {
       cards.map((card) =>
         card.id === cardId
           ? {
-              ...card,
-              content: {
-                ...card.content,
-                agendamento: {
-                  agendar: `Agendado: ${format(localDate, "dd/MM/yy")}`,
-                  dataAgendada: localDate,
-                },
+            ...card,
+            content: {
+              ...card.content,
+              agendamento: {
+                agendar: `Agendado: ${format(localDate, "dd/MM/yy")}`,
+                dataAgendada: localDate,
               },
-            }
+            },
+          }
           : card
       )
     );
@@ -196,6 +267,7 @@ const Home = () => {
         card.id === cardId ? { ...card, column: parseInt(newColumnId) } : card
       )
     );
+    updateCardPositions();
   };
 
   const ColorModal = ({ isOpen, onClose, onSelectColor }) => {
@@ -245,7 +317,45 @@ const Home = () => {
       />
 
       <div className={styles.content}>
-        <div className={styles.columnsContainer}>
+        <div className={styles.columnsContainer} ref={containerRef}>
+          <svg className={styles.connectionSvg}>
+            {Object.entries(
+              cards.reduce((acc, card) => {
+                if (card.batchId) {
+                  acc[card.batchId] = acc[card.batchId] || [];
+                  acc[card.batchId].push(card);
+                }
+                return acc;
+              }, {})
+            )
+              .filter(([_, batchCards]) => batchCards.length > 1)
+              .map(([batchId, batchCards]) =>
+                batchCards
+                  .sort((a, b) => a.column - b.column)
+                  .reduce((lines, card, index, arr) => {
+                    if (index < arr.length - 1) {
+                      const nextCard = arr[index + 1];
+                      if (card.column !== nextCard.column) {
+                        const start = cardPositions[card.id];
+                        const end = cardPositions[nextCard.id];
+                        if (start && end) {
+                          lines.push(
+                            <line
+                              key={`${card.id}-${nextCard.id}`}
+                              className={styles.connectionLine}
+                              x1={start.startX}
+                              y1={start.startY}
+                              x2={end.endX}
+                              y2={end.endY}
+                            />
+                          );
+                        }
+                      }
+                    }
+                    return lines;
+                  }, [])
+              )}
+          </svg>
           <div className={styles.columns}>
             {columns.map((column) => (
               <div
@@ -258,9 +368,8 @@ const Home = () => {
                     type="text"
                     value={column.title}
                     onChange={(e) => editColumnTitle(column.id, e.target.value)}
-                    className={`${styles.columnTitleInput} ${
-                      column.color.includes("#000000") ? styles.whiteText : ""
-                    }`}
+                    className={`${styles.columnTitleInput} ${column.color.includes("#000000") ? styles.whiteText : ""
+                      }`}
                   />
                   <div>
                     <Button
@@ -288,7 +397,11 @@ const Home = () => {
                   {cards
                     .filter((card) => card.column === column.id)
                     .map((card) => (
-                      <Card key={card.id} className={styles.card}>
+                      <Card
+                        key={card.id}
+                        className={styles.card}
+                        ref={(el) => (cardRefs.current[card.id] = el)}
+                      >
                         <Card.Body>
                           <div className={styles.cardHeader}>
                             <h4>Cartão do Procedimento</h4>
@@ -328,7 +441,9 @@ const Home = () => {
                           </p>
                           <input
                             type="date"
-                            value={card.content.agendamento.dataAgendada?.toISOString().split("T")[0] || ""}
+                            value={
+                              card.content.agendamento.dataAgendada?.toISOString().split("T")[0] || ""
+                            }
                             onChange={(e) => handleAgendar(card.id, e.target.value)}
                             className={styles.dateInput}
                           />
@@ -377,7 +492,7 @@ const Home = () => {
 
       <Modal show={isAddCardModalOpen} onHide={closeAddCardModal}>
         <Modal.Header closeButton>
-          <Modal.Title>Adicionar Novo Card</Modal.Title>
+          <Modal.Title>Adicionar Novos Cards</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form>
@@ -392,33 +507,77 @@ const Home = () => {
                 }
               />
             </Form.Group>
-            <Form.Group controlId="formProcedimento">
-              <Form.Label>Procedimento</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Procedimento"
-                value={newCardData.procedimento}
-                onChange={(e) =>
-                  setNewCardData({ ...newCardData, procedimento: e.target.value })
-                }
-              />
-            </Form.Group>
-            <Form.Group controlId="formColuna">
-              <Form.Label>Coluna</Form.Label>
-              <Form.Control
-                as="select"
-                value={newCardData.columnId}
-                onChange={(e) =>
-                  setNewCardData({ ...newCardData, columnId: parseInt(e.target.value) })
-                }
-              >
-                {columns.map((column) => (
-                  <option key={column.id} value={column.id}>
-                    {column.title}
-                  </option>
-                ))}
-              </Form.Control>
-            </Form.Group>
+
+            <h5 className="mt-3">Procedimentos</h5>
+            {newCardData.procedimentos.map((proc, index) => (
+              <div key={index} className="mb-3 d-flex align-items-end">
+                <Form.Group controlId={`formProcedimento-${index}`} className="flex-grow-1 mr-2">
+                  <Form.Label>Procedimento {index + 1}</Form.Label>
+                  <Form.Control
+                    type="text"
+                    placeholder="Buscar procedimento..."
+                    value={filtroProcedimento}
+                    onChange={(e) => setFiltroProcedimento(e.target.value)}
+                  />
+                  <Form.Select
+                    value={proc.procedimento}
+                    onChange={(e) => updateProcedimento(index, "procedimento", e.target.value)}
+                    className="mt-2"
+                  >
+                    {procedimentosDisponiveis
+                      .filter((p) =>
+                        p.ProcedureName &&
+                        p.ProcedureName.toLowerCase().includes(filtroProcedimento.toLowerCase())
+                      )
+                      .map((p) => (
+                        <option key={p.id} value={p.ProcedureName}>
+                          {p.ProcedureName}
+                        </option>
+                      ))}
+                  </Form.Select>
+
+                </Form.Group>
+
+                <Form.Group
+                  controlId={`formColuna-${index}`}
+                  className="flex-grow-1 mr-2"
+                >
+                  <Form.Label>Coluna</Form.Label>
+                  <Form.Control
+                    as="select"
+                    value={proc.columnId}
+                    onChange={(e) =>
+                      updateProcedimento(index, "columnId", parseInt(e.target.value))
+                    }
+                  >
+                    {columns.map((column) => (
+                      <option key={column.id} value={column.id}>
+                        {column.title}
+                      </option>
+                    ))}
+                  </Form.Control>
+                </Form.Group>
+                {newCardData.procedimentos.length > 1 && (
+                  <Button
+                    variant="danger"
+                    size="sm"
+                    onClick={() => removeProcedimento(index)}
+                    className="mt-2"
+                  >
+                    <Trash size={16} />
+                  </Button>
+                )}
+              </div>
+            ))}
+
+            <Button
+              variant="outline-primary"
+              size="sm"
+              onClick={addNewProcedimento}
+              className="mt-2"
+            >
+              Adicionar outro procedimento
+            </Button>
           </Form>
         </Modal.Body>
         <Modal.Footer>
