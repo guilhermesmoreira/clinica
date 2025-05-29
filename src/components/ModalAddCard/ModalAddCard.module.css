@@ -1,0 +1,23 @@
+.largo {
+  max-width: 900px !important;
+  width: 90%;
+}
+
+.modalBody {
+  padding: 1.5rem;
+}
+
+.procedimentoGroup {
+  display: flex;
+  align-items: flex-end;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.flexGrow {
+  flex-grow: 1;
+}
+
+.marginTop {
+  margin-top: 1rem;
+}

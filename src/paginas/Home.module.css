@@ -162,6 +162,7 @@
 }
 
 .modalContent {
+  width: 100%;
   background-color: white;
   padding: 2rem;
   border-radius: 0.5rem;

@@ -1,7 +1,8 @@
 import React from "react";
+import PropTypes from "prop-types";
 import { Button } from "react-bootstrap";
-import { Gear, Plus } from "react-bootstrap-icons"; // Importando ícones do Bootstrap
-import { subDays, addDays, format } from "date-fns"; // Importando funções do date-fns
+import { Gear, Plus } from "react-bootstrap-icons";
+import { subDays, addDays, format } from "date-fns";
 import styles from "./Topbar.module.css";
 
 const Topbar = ({
@@ -14,13 +15,12 @@ const Topbar = ({
   balanceData,
   onAddCard,
 }) => {
-  // Função para atualizar o período com base na data selecionada
   const handleDateChange = (e) => {
     const dateString = e.target.value;
-    const localDate = new Date(dateString + "T00:00:00"); // Ajusta para o fuso horário local
+    const localDate = new Date(dateString + "T00:00:00");
     setSelectedDate(localDate);
-    setFromDate(subDays(localDate, 14)); // Duas semanas para trás
-    setToDate(addDays(localDate, 14)); // Duas semanas para frente
+    setFromDate(subDays(localDate, 14));
+    setToDate(addDays(localDate, 14));
   };
 
   return (
@@ -51,10 +51,10 @@ const Topbar = ({
       </div>
 
       <div className={styles.actions}>
-      <Button
+        <Button
           variant="primary"
           className={styles.iconButton}
-          onClick={onAddCard} // Chama a função para adicionar card
+          onClick={onAddCard}
         >
           <Plus size={20} />
         </Button>
@@ -64,6 +64,23 @@ const Topbar = ({
       </div>
     </div>
   );
+};
+
+// ✅ PropTypes para validação
+Topbar.propTypes = {
+  selectedDate: PropTypes.instanceOf(Date).isRequired,
+  setSelectedDate: PropTypes.func.isRequired,
+  fromDate: PropTypes.instanceOf(Date).isRequired,
+  setFromDate: PropTypes.func.isRequired,
+  toDate: PropTypes.instanceOf(Date).isRequired,
+  setToDate: PropTypes.func.isRequired,
+  balanceData: PropTypes.shape({
+    total: PropTypes.number.isRequired,
+    entradas: PropTypes.number.isRequired,
+    programado: PropTypes.number.isRequired,
+    entregue: PropTypes.number.isRequired,
+  }).isRequired,
+  onAddCard: PropTypes.func.isRequired,
 };
 
 export default Topbar;
