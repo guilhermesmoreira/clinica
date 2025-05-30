@@ -18,7 +18,7 @@ const ModalAddCard = ({
   columns,
 }) => {
   return (
-    <Modal show={isAddCardModalOpen} onHide={closeAddCardModal}>
+    <Modal show={isAddCardModalOpen} onHide={closeAddCardModal} size="xl">
       <Modal.Header closeButton>
         <Modal.Title>Adicionar Novos Cards</Modal.Title>
       </Modal.Header>
@@ -39,49 +39,50 @@ const ModalAddCard = ({
           <h5 className="mt-3">Procedimentos</h5>
           {newCardData.procedimentos.map((proc, index) => (
             <div key={index} className="mb-3 d-flex align-items-end">
-              <Form.Group controlId={`formProcedimento-${index}`} className="flex-grow-1 mr-2">
-                <Form.Label>Procedimento {index + 1}</Form.Label>
-                <Form.Control
-                  type="text"
-                  placeholder="Buscar procedimento..."
-                  value={filtroProcedimento}
-                  onChange={(e) => setFiltroProcedimento(e.target.value)}
-                />
-                <Form.Select
-                  value={proc.procedimento}
-                  onChange={(e) => updateProcedimento(index, "procedimento", e.target.value)}
-                  className="mt-2"
-                >
-                  {procedimentosDisponiveis
-                    .filter((p) =>
-                      p.ProcedureName &&
-                      p.ProcedureName.toLowerCase().includes(filtroProcedimento.toLowerCase())
-                    )
-                    .map((p) => (
-                      <option key={p.id} value={p.ProcedureName}>
-                        {p.ProcedureName}
+              <div className="mb-3 d-flex flex-wrap align-items-end gap-3">
+                <Form.Group controlId={`formProcedimento-${index}`} style={{ flex: 2, minWidth: "300px" }}>
+                  <Form.Label>Procedimento {index + 1}</Form.Label>
+                  <Form.Control
+                    type="text"
+                    placeholder="Buscar procedimento..."
+                    value={filtroProcedimento}
+                    onChange={(e) => setFiltroProcedimento(e.target.value)}
+                  />
+                  <Form.Select
+                    value={proc.procedimento}
+                    onChange={(e) => updateProcedimento(index, "procedimento", e.target.value)}
+                    className="mt-2"
+                  >
+                    {procedimentosDisponiveis
+                      .filter((p) =>
+                        p.ProcedureName &&
+                        p.ProcedureName.toLowerCase().includes(filtroProcedimento.toLowerCase())
+                      )
+                      .map((p) => (
+                        <option key={p.id} value={p.ProcedureName}>
+                          {p.ProcedureName}
+                        </option>
+                      ))}
+                  </Form.Select>
+                </Form.Group>
+
+                <Form.Group controlId={`formColuna-${index}`} style={{ flex: 1, minWidth: "200px" }}>
+                  <Form.Label>Coluna</Form.Label>
+                  <Form.Control
+                    as="select"
+                    value={proc.columnId}
+                    onChange={(e) =>
+                      updateProcedimento(index, "columnId", parseInt(e.target.value))
+                    }
+                  >
+                    {columns.map((column) => (
+                      <option key={column.id} value={column.id}>
+                        {column.title}
                       </option>
                     ))}
-                </Form.Select>
-              </Form.Group>
-
-              <Form.Group controlId={`formColuna-${index}`} className="flex-grow-1 mr-2">
-                <Form.Label>Coluna</Form.Label>
-                <Form.Control
-                  as="select"
-                  value={proc.columnId}
-                  onChange={(e) =>
-                    updateProcedimento(index, "columnId", parseInt(e.target.value))
-                  }
-                >
-                  {columns.map((column) => (
-                    <option key={column.id} value={column.id}>
-                      {column.title}
-                    </option>
-                  ))}
-                </Form.Control>
-              </Form.Group>
-
+                  </Form.Control>
+                </Form.Group>
+              </div>
               {newCardData.procedimentos.length > 1 && (
                 <Button
                   variant="danger"

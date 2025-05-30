@@ -10,6 +10,7 @@ const CardDetalhadoModal = ({
   handleColumnChange,
   deleteCard,
   columns,
+  toggleAgendamentoStatus,
 }) => {
   if (!card) return null;
 
@@ -52,15 +53,33 @@ const CardDetalhadoModal = ({
             ))}
           </div>
 
-          <p><strong>Agendamento:</strong> {card.content.agendamento.agendar}</p>
-          <input
-            type="date"
-            value={
-              card.content.agendamento.dataAgendada?.toISOString().split("T")[0] || ""
-            }
-            onChange={(e) => handleAgendar(card.id, e.target.value)}
-            className={styles.dateInput}
-          />
+          <div className={styles.etapas}>
+            <strong>Status de Agendamento:</strong>
+            <div>
+              <input
+                type="checkbox"
+                checked={card.content.agendamento.status === "agendar"}
+                onChange={() => toggleAgendamentoStatus(card.id, "agendar")}
+              />
+              Agendar
+            </div>
+            <div>
+              <input
+                type="checkbox"
+                checked={card.content.agendamento.status === "agendado"}
+                onChange={() => toggleAgendamentoStatus(card.id, "agendado")}
+              />
+              Agendado
+            </div>
+            <div>
+              <input
+                type="checkbox"
+                checked={card.content.agendamento.status === "realizado"}
+                onChange={() => toggleAgendamentoStatus(card.id, "realizado")}
+              />
+              Realizado
+            </div>
+          </div>
           <p><strong>Saldo:</strong> {card.content.saldo}</p>
           <p className={`${styles.status} ${card.content.status}`}>
             Status: {card.content.status}
