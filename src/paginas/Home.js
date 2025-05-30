@@ -14,6 +14,22 @@ const Home = () => {
   const columnsContainerRef = useRef(null);
   const [showConnectionsModal, setShowConnectionsModal] = useState(false);
   const [selectedCard, setSelectedCard] = useState(null);
+  const [balanceData, setBalanceData] = useState({
+    total: 0,
+    entradas: 0,
+    programado: 0,
+    entregue: 0,
+  });
+
+  useEffect(() => {
+    const atualizarSaldo = async () => {
+      const dados = await fetchBalanceData(state.fromDate, state.toDate);
+      setBalanceData(dados);
+    };
+
+    atualizarSaldo();
+  }, [state.fromDate, state.toDate]);
+
 
   // Atualiza posições dos cards para desenhar linhas
   const updateCardPositions = useCallback(() => {
@@ -63,6 +79,31 @@ const Home = () => {
     };
   }, [updateCardPositions]);
 
+  const fetchBalanceData = async (fromDate, toDate) => {
+    try {
+      const response = await fetch(
+        `http://localhost:8000/estimativas?from=${fromDate.toISOString().split("T")[0]}&to=${toDate.toISOString().split("T")[0]}`
+      );
+      const data = await response.json();
+
+      return {
+        total: (data.OpenTotalAmount || 0) + (data.FollowUpTotalAmount || 0),
+        entradas: data.OpenTotalAmount || 0,
+        programado: data.ApprovedTotalAmount || 0,
+        entregue: data.FollowUpTotalAmount || 0,
+      };
+    } catch (error) {
+      console.error("Erro ao buscar estimativas:", error);
+      return {
+        total: 0,
+        entradas: 0,
+        programado: 0,
+        entregue: 0,
+      };
+    }
+  };
+
+
   // Atualiza o selectedCard quando o estado global muda
   useEffect(() => {
     if (selectedCard) {
@@ -104,11 +145,16 @@ const Home = () => {
 
   return (
     <div className={styles.container}>
-      <Topbar {...state} {...handlers} onAddCard={handlers.openAddCardModal} />
+      <Topbar
+        {...state}
+        {...handlers}
+        balanceData={balanceData}
+        onAddCard={handlers.openAddCardModal}
+      />
 
       <div className={styles.content}>
         <div className={styles.columnsContainer} ref={columnsContainerRef}>
-          {/* SVG das linhas entre cards conectados */}          
+          {/* SVG das linhas entre cards conectados */}
           <svg ref={svgRef} className={styles.connectionSvg}>
             {state.cards.flatMap(card => {
               return (card.connections || []).map(connectedCardId => {
