@@ -35,7 +35,7 @@ const CardDetalhadoModal = ({
               Remover
             </Button>
           </div>
-          <p><strong>ID:</strong> {card.content.ID}</p>
+          <p><strong>ID:</strong> {card.content.pacienteId}</p>
           <p><strong>Paciente:</strong> {card.content.paciente}</p>
           <p><strong>Procedimento:</strong> {card.content.procedimento}</p>
 

@@ -131,11 +131,17 @@ export default function useProcedimentos() {
     };
 
     const handleAddCard = () => {
-        if (!newCardData.paciente || newCardData.procedimentos.some((p) => !p.procedimento)) {
-            alert("Preencha todos os dados.");
+        if (
+            !newCardData.paciente ||
+            !newCardData.pacienteId ||
+            newCardData.procedimentos.some((p) => !p.procedimento)
+        ) {
+            alert("Preencha todos os dados corretamente.");
             return;
         }
+
         const currentBatchId = nextBatchId;
+
         const novosCards = newCardData.procedimentos.map((proc, index) => ({
             id: nextCardId + index,
             column: proc.columnId,
@@ -143,6 +149,7 @@ export default function useProcedimentos() {
             content: {
                 ID: `${nextCardId + index}`,
                 paciente: newCardData.paciente,
+                pacienteId: newCardData.pacienteId,
                 procedimento: proc.procedimento,
                 etapas: [
                     { etapa: "Etapa 1 [30min]", concluida: false },

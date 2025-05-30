@@ -1,7 +1,8 @@
 // src/components/ModalAddCard.js
-import React from "react";
 import { Button, Form, Modal } from "react-bootstrap";
 import { Trash } from "react-bootstrap-icons";
+import { useState, React } from "react";
+import axios from "axios";
 
 const ModalAddCard = ({
   isAddCardModalOpen,
@@ -25,15 +26,47 @@ const ModalAddCard = ({
       <Modal.Body>
         <Form>
           <Form.Group controlId="formPaciente">
-            <Form.Label>Paciente</Form.Label>
-            <Form.Control
-              type="text"
-              placeholder="Nome do paciente"
-              value={newCardData.paciente}
-              onChange={(e) =>
-                setNewCardData({ ...newCardData, paciente: e.target.value })
-              }
-            />
+            <Form.Label>Buscar Paciente</Form.Label>
+            <div className="d-flex gap-2">
+              <Form.Control
+                type="text"
+                placeholder="Digite o nome do paciente"
+                value={newCardData.nomeBusca || ""}
+                onChange={(e) =>
+                  setNewCardData({ ...newCardData, nomeBusca: e.target.value })
+                }
+              />
+              <Button
+                variant="secondary"
+                onClick={async () => {
+                  try {
+                    const response = await axios.get(`http://localhost:8000/pacientes`, {
+                      params: { nome: newCardData.nomeBusca }
+                    });
+                    if (response.data.length > 0) {
+                      const paciente = response.data[0];
+                      setNewCardData((prev) => ({
+                        ...prev,
+                        paciente: paciente.Name,
+                        pacienteId: paciente.PatientId,
+                      }));
+                    } else {
+                      alert("Paciente não encontrado.");
+                    }
+                  } catch (err) {
+                    alert("Erro ao buscar paciente.");
+                  }
+                }}
+              >
+                Buscar
+              </Button>
+            </div>
+            {newCardData.paciente && (
+              <div className="mt-2">
+                <strong>Nome:</strong> {newCardData.paciente} <br />
+                <strong>ID:</strong> {newCardData.pacienteId}
+              </div>
+            )}
           </Form.Group>
 
           <h5 className="mt-3">Procedimentos</h5>
