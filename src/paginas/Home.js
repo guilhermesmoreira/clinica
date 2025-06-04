@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useCallback, useState } from "react";
 import { Button } from "react-bootstrap";
 import styles from "./Home.module.css";
+import Sidebar from "../components/Sidebar/Sidebar";
 import Topbar from "../components/Topbar/Topbar";
 import useProcedimentos from "../hooks/useProcedimentos";
 import Column from "../components/Column/Column";
@@ -152,62 +153,63 @@ const Home = () => {
         onAddCard={handlers.openAddCardModal}
       />
 
-      <div className={styles.content}>
-        <div className={styles.columnsContainer} ref={columnsContainerRef}>
-          {/* SVG das linhas entre cards conectados */}
-          <svg ref={svgRef} className={styles.connectionSvg}>
-            {state.cards.flatMap(card => {
-              return (card.connections || []).map(connectedCardId => {
-                // Evita renderizar a conexão inversa
-                if (card.id > connectedCardId) return null;
 
-                const connectedCard = state.cards.find(c => c.id === connectedCardId);
-                if (!connectedCard) return null;
+      <div className={styles.pageBody}>
+        <Sidebar cards={state.cards}/>
+        <div className={styles.mainContent}>
+          <div className={styles.content}>
+            <div className={styles.columnsContainer} ref={columnsContainerRef}>
+              <svg ref={svgRef} className={styles.connectionSvg}>
+                {state.cards.flatMap(card => {
+                  return (card.connections || []).map(connectedCardId => {
+                    if (card.id > connectedCardId) return null;
+                    const connectedCard = state.cards.find(c => c.id === connectedCardId);
+                    if (!connectedCard) return null;
+                    const start = state.cardPositions[card.id];
+                    const end = state.cardPositions[connectedCardId];
+                    if (start && end) {
+                      return (
+                        <line
+                          key={`${card.id}-${connectedCardId}`}
+                          x1={start.startX}
+                          y1={start.startY}
+                          x2={end.endX}
+                          y2={end.endY}
+                          className={styles.connectionLine}
+                        />
+                      );
+                    }
+                    return null;
+                  });
+                })}
+              </svg>
 
-                const start = state.cardPositions[card.id];
-                const end = state.cardPositions[connectedCardId];
+              {/* Colunas com os cards */}
+              <div className={styles.columns}>
+                {state.columns.map((column) => (
+                  <Column
+                    key={column.id}
+                    column={column}
+                    cards={state.cards}
+                    cardRefs={state.cardRefs}
+                    columns={state.columns}
+                    setSelectedCard={setSelectedCard}
+                    setShowConnectionsModal={setShowConnectionsModal}
+                    {...handlers}
+                  />
+                ))}
+              </div>
 
-                if (start && end) {
-                  return (
-                    <line
-                      key={`${card.id}-${connectedCardId}`}
-                      x1={start.startX}
-                      y1={start.startY}
-                      x2={end.endX}
-                      y2={end.endY}
-                      className={styles.connectionLine}
-                    />
-                  );
-                }
-                return null;
-              });
-            })}
-          </svg>
-
-          {/* Colunas com os cards */}
-          <div className={styles.columns}>
-            {state.columns.map((column) => (
-              <Column
-                key={column.id}
-                column={column}
-                cards={state.cards}
-                cardRefs={state.cardRefs}
-                columns={state.columns}
-                setSelectedCard={setSelectedCard}
-                setShowConnectionsModal={setShowConnectionsModal}
-                {...handlers}
-              />
-            ))}
+              <Button
+                variant="outline"
+                size="sm"
+                className={styles.addColumnButton}
+                onClick={handlers.addColumn}
+              >
+                +
+              </Button>
+            </div>
           </div>
-
-          <Button
-            variant="outline"
-            size="sm"
-            className={styles.addColumnButton}
-            onClick={handlers.addColumn}
-          >
-            +
-          </Button>
         </div>
       </div>
 

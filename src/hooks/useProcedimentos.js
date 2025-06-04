@@ -19,6 +19,26 @@ export default function useProcedimentos() {
             title: "Etapa 1",
             color: "linear-gradient(45deg, #000000, #424242, #000000)", // preto por padrão
         },
+        {
+            id: 2,
+            title: "Etapa 2",
+            color: "linear-gradient(45deg, #000000, #424242, #000000)", // preto por padrão
+        },
+        {
+            id: 3,
+            title: "Etapa 3",
+            color: "linear-gradient(45deg, #000000, #424242, #000000)", // preto por padrão
+        },
+        {
+            id: 4,
+            title: "Etapa 4",
+            color: "linear-gradient(45deg, #000000, #424242, #000000)", // preto por padrão
+        },
+        {
+            id: 5,
+            title: "Etapa 5",
+            color: "linear-gradient(45deg, #000000, #424242, #000000)", // preto por padrão
+        },
     ]);
 
     const [cards, setCards] = useState([]);

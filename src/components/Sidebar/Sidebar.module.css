@@ -1,0 +1,58 @@
+.sidebar {
+  width: 300px;
+  background-color: #1f1f1f;
+  color: white;
+  padding: 1rem;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.abasContainer {
+  display: flex;
+  flex-direction: row; /* horizontal */
+  gap: 0.5rem;
+}
+
+.aba {
+  flex: 1;
+  padding: 0.5rem;
+  background-color: #2c2c2c;
+  border: none;
+  border-radius: 4px;
+  color: white;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  text-align: center;
+}
+
+.aba:hover {
+  background-color: #3a3a3a;
+}
+
+.ativa {
+  background-color: #00bfff;
+  color: #000;
+}
+
+.listaPacientes {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  color: white;
+}
+
+.paciente {
+  background-color: #2c2c2c;
+  padding: 0.5rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.vazio {
+  margin-top: 1rem;
+  font-size: 0.85rem;
+  color: #bbb;
+  text-align: center;
+}

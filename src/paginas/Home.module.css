@@ -299,3 +299,13 @@
 .statusRealizado {
   background-color: #6c757d; /* cinza */
 }
+
+.pageBody {
+  display: flex;
+  height: calc(100vh - 60px); 
+}
+
+.mainContent {
+  flex-grow: 1;
+  overflow: auto;  
+}
