@@ -4,6 +4,7 @@ import { Button } from "react-bootstrap";
 import { Gear, Plus } from "react-bootstrap-icons";
 import { subDays, addDays, format } from "date-fns";
 import styles from "./Topbar.module.css";
+import { useNavigate } from "react-router-dom";
 
 const Topbar = ({
   selectedDate,
@@ -21,6 +22,12 @@ const Topbar = ({
     setSelectedDate(localDate);
     setFromDate(subDays(localDate, 14));
     setToDate(addDays(localDate, 14));
+  };
+
+  const navigate = useNavigate();
+
+  const irParaPlanejamento = () => {
+    navigate("/planejamento");
   };
 
   return (
@@ -54,7 +61,7 @@ const Topbar = ({
         <Button
           variant="primary"
           className={styles.iconButton}
-          onClick={onAddCard}
+          onClick={irParaPlanejamento}
         >
           <Plus size={20} />
         </Button>

@@ -1,17 +1,19 @@
-import './App.css';
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Home from './paginas/Home';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Layout from "./components/Layout/Layout";
+import Home from "./paginas/Home";
+import Planejamento from "./paginas/Planejamento";
 
 function App() {
   return (
-    <div className="App">
-       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Home />} />  
-        </Routes>
-      </BrowserRouter>
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Layout />}>
+          <Route index element={<Home />} />
+          <Route path="planejamento" element={<Planejamento />} />
+        </Route>
+      </Routes>
+    </Router>
   );
 }
 

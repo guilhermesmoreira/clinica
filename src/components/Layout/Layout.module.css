@@ -1,0 +1,17 @@
+.layoutContainer {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.body {
+  display: flex;
+  flex-grow: 1;
+  overflow: hidden;
+}
+
+.content {
+  flex: 1;
+  padding: 1rem;
+  overflow-y: auto;
+}

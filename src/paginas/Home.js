@@ -8,6 +8,7 @@ import Column from "../components/Column/Column";
 import ModalAddCard from "../components/ModalAddCard/ModalAddCard";
 import ColorModal from "../components/ColorModal/ColorModal";
 import ModalConnections from "../components/ModalConnections/ModalConnections";
+import { useNavigate } from "react-router-dom";
 
 const Home = () => {
   const [state, handlers] = useProcedimentos();
@@ -21,6 +22,8 @@ const Home = () => {
     programado: 0,
     entregue: 0,
   });
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const atualizarSaldo = async () => {
