@@ -17,27 +17,27 @@ export default function useProcedimentos() {
         {
             id: 1,
             title: "Etapa 1",
-            color: "linear-gradient(45deg, #000000, #424242, #000000)", // preto por padrão
+            color: "linear-gradient(45deg, #000000, #424242, #000000)",
         },
         {
             id: 2,
             title: "Etapa 2",
-            color: "linear-gradient(45deg, #000000, #424242, #000000)", // preto por padrão
+            color: "linear-gradient(45deg, #000000, #424242, #000000)",
         },
         {
             id: 3,
             title: "Etapa 3",
-            color: "linear-gradient(45deg, #000000, #424242, #000000)", // preto por padrão
+            color: "linear-gradient(45deg, #000000, #424242, #000000)",
         },
         {
             id: 4,
             title: "Etapa 4",
-            color: "linear-gradient(45deg, #000000, #424242, #000000)", // preto por padrão
+            color: "linear-gradient(45deg, #000000, #424242, #000000)",
         },
         {
             id: 5,
             title: "Etapa 5",
-            color: "linear-gradient(45deg, #000000, #424242, #000000)", // preto por padrão
+            color: "linear-gradient(45deg, #000000, #424242, #000000)",
         },
     ]);
 
@@ -51,6 +51,8 @@ export default function useProcedimentos() {
     const [filtroProcedimento, setFiltroProcedimento] = useState("");
     const [newCardData, setNewCardData] = useState({
         paciente: "",
+        pacienteId: "",
+        nomeBusca: "",
         procedimentos: [{ procedimento: "", columnId: 1 }],
     });
     const [nextBatchId, setNextBatchId] = useState(1);
@@ -63,9 +65,12 @@ export default function useProcedimentos() {
             try {
                 const response = await axios.get("http://localhost:8000/procedimentos");
                 const rawData = response.data;
-                const procedimentosArray = Object.values(rawData)
-                    .flat()
-                    .filter((p) => p && typeof p === "object" && p.ProcedureName);
+                // Ajuste para a estrutura da API Clinicorp
+                const procedimentosArray = Array.isArray(rawData)
+                    ? rawData.filter((p) => p && p.ProcedureName)
+                    : Object.values(rawData)
+                        .flat()
+                        .filter((p) => p && p.ProcedureName);
                 setProcedimentosDisponiveis(procedimentosArray);
             } catch (error) {
                 console.error("Erro ao buscar procedimentos da Clinicorp:", error);
@@ -80,7 +85,7 @@ export default function useProcedimentos() {
             {
                 id: nextColumnId,
                 title: `Etapa ${nextColumnId}`,
-                color: "linear-gradient(45deg, #000000, #424242, #000000)", // preto padrão
+                color: "linear-gradient(45deg, #000000, #424242, #000000)",
             },
         ]);
         setNextColumnId(nextColumnId + 1);
@@ -123,6 +128,8 @@ export default function useProcedimentos() {
         setIsAddCardModalOpen(false);
         setNewCardData({
             paciente: "",
+            pacienteId: "",
+            nomeBusca: "",
             procedimentos: [{ procedimento: "", columnId: columns[0].id }],
         });
     };
@@ -145,7 +152,7 @@ export default function useProcedimentos() {
         if (newCardData.procedimentos.length > 1) {
             setNewCardData({
                 ...newCardData,
-                procedimentos: newCardData.procedimentos.filter((_, i) => i !== index),
+                procedimentos: newCardData.procedimentos.filter((_, i) => i !== index)
             });
         }
     };

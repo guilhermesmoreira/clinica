@@ -1,9 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import styles from "./Planejamento.module.css";
 import SidebarPlanejamento from "../components/SidebarPlanejamento/SidebarPlanejamento";
 import Column from "../components/Column/Column";
 import Topbar from "../components/Topbar/Topbar";
+import ModalAddCard from "../components/ModalAddCard/ModalAddCard";
 import { subDays, addDays } from "date-fns";
+import axios from "axios";
+import useProcedimentos from "../hooks/useProcedimentos";
 
 const colunasFixas = [
   { id: "col1", title: "Etapa 1", color: "#f5f5f5" },
@@ -14,64 +18,82 @@ const colunasFixas = [
 ];
 
 const Planejamento = () => {
-  const [cardsPlanejamento, setCardsPlanejamento] = useState([]); // todos os cards do paciente
-  const [columns, setColumns] = useState(colunasFixas);
+  const [state, handlers] = useProcedimentos();
+  const [pacienteSelecionado, setPacienteSelecionado] = useState(null);
   const [cardsDistribuidos, setCardsDistribuidos] = useState({});
+  const location = useLocation();
 
-  // Props obrigatórias da Topbar
-  const [selectedDate, setSelectedDate] = useState(new Date());
-  const [fromDate, setFromDate] = useState(subDays(new Date(), 14));
-  const [toDate, setToDate] = useState(addDays(new Date(), 14));
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const pacienteId = params.get("pacienteId");
+    if (pacienteId) {
+      // Como não há GET /pacientes/{id}, buscamos por nome ou usamos estado
+      axios
+        .get(`http://localhost:8000/pacientes`, {
+          params: { nome: "" }, // Nome vazio para buscar todos ou ajustar com outro critério
+        })
+        .then((response) => {
+          const paciente = response.data.find((p) => p.PatientId === pacienteId);
+          if (paciente) {
+            setPacienteSelecionado(paciente);
+            handlers.setNewCardData({
+              ...state.newCardData,
+              paciente: paciente.Name,
+              pacienteId: paciente.PatientId,
+            });
+          } else {
+            alert("Paciente não encontrado.");
+          }
+        })
+        .catch((err) => {
+          console.error("Erro ao buscar paciente:", err);
+          alert("Erro ao carregar dados do paciente.");
+        });
+    }
+  }, [location, handlers, state.newCardData]);
 
-  const balanceData = {
-    total: 0,
-    entradas: 0,
-    programado: 0,
-    entregue: 0,
-  };
-
-  const onAddCard = () => {}; // não usado na tela de planejamento
-
-  const handleSalvar = () => {
+  const handleSalvar = async () => {
     const todosCards = Object.entries(cardsDistribuidos).flatMap(([colunaId, cards]) => {
       return cards.map((card) => ({ ...card, columnId: colunaId }));
     });
 
-    // Simula envio para backend
-    console.log("Salvar planejamento:", todosCards);
-    // Aqui você pode usar fetch/axios para salvar e redirecionar para a Home
+    // Salvamento local, já que não há POST /planejamento
+    handlers.setCards([...state.cards, ...todosCards]);
+    alert("Planejamento salvo localmente!");
   };
 
   return (
     <div className={styles.planejamentoContainer}>
       <Topbar
-        selectedDate={selectedDate}
-        setSelectedDate={setSelectedDate}
-        fromDate={fromDate}
-        setFromDate={setFromDate}
-        toDate={toDate}
-        setToDate={setToDate}
-        balanceData={balanceData}
-        onAddCard={onAddCard}
+        selectedDate={state.selectedDate}
+        setSelectedDate={state.setSelectedDate}
+        fromDate={state.fromDate}
+        setFromDate={state.setFromDate}
+        toDate={state.toDate}
+        setToDate={state.setToDate}
+        balanceData={state.balanceData}
+        onAddCard={handlers.openAddCardModal}
       />
 
       <div className={styles.planejamentoContent}>
         <SidebarPlanejamento
-          cards={cardsPlanejamento}
-          setCardsDistribuidos={setCardsDistribuidos}
+          cards={state.cards}
           cardsDistribuidos={cardsDistribuidos}
+          setCardsDistribuidos={setCardsDistribuidos}
+          setPacienteSelecionado={setPacienteSelecionado}
         />
 
         <div className={styles.colunasArea}>
-          {columns.map((col) => (
+          {colunasFixas.map((col) => (
             <Column
               key={col.id}
               column={col}
               cards={cardsDistribuidos[col.id] || []}
               setCardsDistribuidos={setCardsDistribuidos}
-              allCards={cardsPlanejamento}
+              allCards={state.cards}
               columnId={col.id}
               isPlanejamento
+              {...handlers}
             />
           ))}
           <button className={styles.salvarButton} onClick={handleSalvar}>
@@ -79,6 +101,12 @@ const Planejamento = () => {
           </button>
         </div>
       </div>
+
+      <ModalAddCard
+        {...state}
+        {...handlers}
+        columns={colunasFixas}
+      />
     </div>
   );
 };

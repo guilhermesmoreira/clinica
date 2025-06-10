@@ -1,0 +1,35 @@
+.planejamentoContainer {
+  min-height: 100vh;
+  background-color: #7e7e7e;
+  display: flex;
+  flex-direction: column;
+}
+
+.planejamentoContent {
+  flex-grow: 1;
+  display: flex;
+  padding: 1rem;
+  overflow-y: auto;
+}
+
+.colunasArea {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  flex-grow: 1;
+  overflow: visible;
+}
+
+.salvarButton {
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 0.25rem;
+  cursor: pointer;
+}
+
+.salvarButton:hover {
+  background-color: #218838;
+}
