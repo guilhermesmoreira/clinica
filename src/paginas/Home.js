@@ -5,9 +5,10 @@ import Sidebar from "../components/Sidebar/Sidebar";
 import Topbar from "../components/Topbar/Topbar";
 import useProcedimentos from "../hooks/useProcedimentos";
 import Column from "../components/Column/Column";
-import ModalAddCard from "../components/ModalAddCard/ModalAddCard";
 import ColorModal from "../components/ColorModal/ColorModal";
 import ModalConnections from "../components/ModalConnections/ModalConnections";
+import ModalSelecionarPaciente from "../components/ModalSelecionarPaciente/ModalSelecionarPaciente";
+import { useNavigate } from "react-router-dom";
 
 const Home = () => {
   const [state, handlers] = useProcedimentos();
@@ -22,63 +23,25 @@ const Home = () => {
     entregue: 0,
   });
 
-  useEffect(() => {
-    const atualizarSaldo = async () => {
-      const dados = await fetchBalanceData(state.fromDate, state.toDate);
-      setBalanceData(dados);
-    };
+  const [showPacienteModal, setShowPacienteModal] = useState(false);
+  const navigate = useNavigate();
 
-    atualizarSaldo();
-  }, [state.fromDate, state.toDate]);
+  const handleConfirmarPaciente = async (pacienteSelecionado) => {
+    console.log("Paciente selecionado:", pacienteSelecionado);
 
+    // Primeiro fecha o modal
+    setShowPacienteModal(false);
 
-  // Atualiza posições dos cards para desenhar linhas
-  const updateCardPositions = useCallback(() => {
-    if (!columnsContainerRef.current || !svgRef.current) return;
+    // Aguarda o ciclo de renderização completar
+    await new Promise(resolve => setTimeout(resolve, 0));
 
-    const containerRect = columnsContainerRef.current.getBoundingClientRect();
-    const scrollLeft = columnsContainerRef.current.scrollLeft;
-    const scrollTop = columnsContainerRef.current.scrollTop;
-
-    const positions = {};
-
-    Object.keys(state.cardRefs.current).forEach((cardId) => {
-      const element = state.cardRefs.current[cardId];
-      if (element) {
-        const rect = element.getBoundingClientRect();
-        positions[cardId] = {
-          // Ponto de SAÍDA (lado direito do card)
-          startX: rect.right - containerRect.left + scrollLeft,
-          startY: rect.top - containerRect.top + scrollTop + rect.height / 2,
-          // Ponto de ENTRADA (lado esquerdo do card)
-          endX: rect.left - containerRect.left + scrollLeft,
-          endY: rect.top - containerRect.top + scrollTop + rect.height / 2,
-        };
-      }
+    // Depois navega
+    navigate("/planejamento", {
+      state: { paciente: pacienteSelecionado },
+      replace: true
     });
+  };
 
-    handlers.setCardPositions(positions);
-  }, [state.cards, handlers]);
-
-  // Efeito para atualizar posições
-  useEffect(() => {
-    const container = columnsContainerRef.current;
-    if (!container) return;
-
-    const observer = new MutationObserver(updateCardPositions);
-    observer.observe(container, { childList: true, subtree: true });
-
-    container.addEventListener('scroll', updateCardPositions, { passive: true });
-    window.addEventListener('resize', updateCardPositions);
-
-    updateCardPositions();
-
-    return () => {
-      observer.disconnect();
-      container.removeEventListener('scroll', updateCardPositions);
-      window.removeEventListener('resize', updateCardPositions);
-    };
-  }, [updateCardPositions]);
 
   const fetchBalanceData = async (fromDate, toDate) => {
     try {
@@ -104,8 +67,61 @@ const Home = () => {
     }
   };
 
+  useEffect(() => {
+    const atualizarSaldo = async () => {
+      const dados = await fetchBalanceData(state.fromDate, state.toDate);
+      setBalanceData(dados);
+    };
 
-  // Atualiza o selectedCard quando o estado global muda
+    atualizarSaldo();
+  }, [state.fromDate, state.toDate]);
+
+  const updateCardPositions = useCallback(() => {
+  if (!columnsContainerRef.current || !svgRef.current) return;
+
+  const containerRect = columnsContainerRef.current.getBoundingClientRect();
+  const scrollLeft = columnsContainerRef.current.scrollLeft;
+  const scrollTop = columnsContainerRef.current.scrollTop;
+
+  const positions = {};
+
+  Object.keys(state.cardRefs.current).forEach((cardId) => {
+    const element = state.cardRefs.current[cardId];
+    if (element) {
+      const rect = element.getBoundingClientRect();
+      positions[cardId] = {
+        startX: rect.right - containerRect.left + scrollLeft,
+        startY: rect.top - containerRect.top + scrollTop + rect.height / 2,
+        endX: rect.left - containerRect.left + scrollLeft,
+        endY: rect.top - containerRect.top + scrollTop + rect.height / 2,
+      };
+    }
+  });
+
+  // Armazene em uma ref ou isole fora do loop de renderização
+  handlers.setCardPositions(positions);
+}, [state.cardRefs, handlers.setCardPositions]);
+
+
+  useEffect(() => {
+    const container = columnsContainerRef.current;
+    if (!container) return;
+
+    const observer = new MutationObserver(updateCardPositions);
+    observer.observe(container, { childList: true, subtree: true });
+
+    container.addEventListener("scroll", updateCardPositions, { passive: true });
+    window.addEventListener("resize", updateCardPositions);
+
+    updateCardPositions();
+
+    return () => {
+      observer.disconnect();
+      container.removeEventListener("scroll", updateCardPositions);
+      window.removeEventListener("resize", updateCardPositions);
+    };
+  }, [updateCardPositions]);
+
   useEffect(() => {
     if (selectedCard) {
       const updatedCard = state.cards.find(c => c.id === selectedCard.id);
@@ -115,14 +131,13 @@ const Home = () => {
     }
   }, [state.cards, selectedCard]);
 
-  // Funções para manipular conexões - Modifique assim:
   const addConnection = (cardId, connectedCardId) => {
     handlers.setCards(prevCards =>
       prevCards.map(card => {
         if (card.id === cardId && !card.connections?.includes(connectedCardId)) {
           return {
             ...card,
-            connections: [...(card.connections || []), connectedCardId]
+            connections: [...(card.connections || []), connectedCardId],
           };
         }
         return card;
@@ -136,7 +151,7 @@ const Home = () => {
         if (card.id === cardId) {
           return {
             ...card,
-            connections: (card.connections || []).filter(id => id !== connectedCardId)
+            connections: (card.connections || []).filter(id => id !== connectedCardId),
           };
         }
         return card;
@@ -150,18 +165,17 @@ const Home = () => {
         {...state}
         {...handlers}
         balanceData={balanceData}
-        onAddCard={handlers.openAddCardModal}
+        abrirModalAdicionar={() => setShowPacienteModal(true)}
       />
 
-
       <div className={styles.pageBody}>
-        <Sidebar cards={state.cards}/>
+        <Sidebar cards={state.cards} />
         <div className={styles.mainContent}>
           <div className={styles.content}>
             <div className={styles.columnsContainer} ref={columnsContainerRef}>
               <svg ref={svgRef} className={styles.connectionSvg}>
-                {state.cards.flatMap(card => {
-                  return (card.connections || []).map(connectedCardId => {
+                {state.cards.flatMap(card =>
+                  (card.connections || []).map(connectedCardId => {
                     if (card.id > connectedCardId) return null;
                     const connectedCard = state.cards.find(c => c.id === connectedCardId);
                     if (!connectedCard) return null;
@@ -180,13 +194,12 @@ const Home = () => {
                       );
                     }
                     return null;
-                  });
-                })}
+                  })
+                )}
               </svg>
 
-              {/* Colunas com os cards */}
               <div className={styles.columns}>
-                {state.columns.map((column) => (
+                {state.columns.map(column => (
                   <Column
                     key={column.id}
                     column={column}
@@ -219,8 +232,6 @@ const Home = () => {
         onSelectColor={handlers.handleColorSelect}
       />
 
-      <ModalAddCard {...state} {...handlers} columns={state.columns} />
-
       <ModalConnections
         show={showConnectionsModal}
         onHide={() => setShowConnectionsModal(false)}
@@ -229,8 +240,15 @@ const Home = () => {
         onAddConnection={addConnection}
         onRemoveConnection={removeConnection}
       />
+
+      <ModalSelecionarPaciente
+        show={showPacienteModal}
+        onHide={() => setShowPacienteModal(false)}
+        onConfirm={handleConfirmarPaciente}
+      />
     </div>
   );
 };
+
 
 export default Home;

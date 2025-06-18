@@ -1,0 +1,41 @@
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 24px;
+  background-color: #f1f1f1;
+  border-bottom: 1px solid #ccc;
+  position: relative;
+  height: 120px;
+}
+
+.centerText {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+}
+
+.title {
+  margin-top: 15px;
+  font-size: 26px;
+  color: #555;
+  font-weight: 500;
+  margin-bottom: 15px;
+}
+
+.nome {
+  margin: 0;
+  font-size: 20px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 15px;
+}
+
+.rightButton {
+  z-index: 1;
+}
+
+.spacer {
+  width: 100px;
+}

@@ -13,7 +13,7 @@ const Topbar = ({
   toDate,
   setToDate,
   balanceData,
-  onAddCard,
+  abrirModalAdicionar,
 }) => {
   const handleDateChange = (e) => {
     const dateString = e.target.value;
@@ -54,7 +54,7 @@ const Topbar = ({
         <Button
           variant="primary"
           className={styles.iconButton}
-          onClick={onAddCard}
+          onClick={abrirModalAdicionar}
         >
           <Plus size={20} />
         </Button>
@@ -66,7 +66,6 @@ const Topbar = ({
   );
 };
 
-// ✅ PropTypes para validação
 Topbar.propTypes = {
   selectedDate: PropTypes.instanceOf(Date).isRequired,
   setSelectedDate: PropTypes.func.isRequired,
@@ -80,7 +79,7 @@ Topbar.propTypes = {
     programado: PropTypes.number.isRequired,
     entregue: PropTypes.number.isRequired,
   }).isRequired,
-  onAddCard: PropTypes.func.isRequired,
+  abrirModalAdicionar: PropTypes.func.isRequired,
 };
 
 export default Topbar;

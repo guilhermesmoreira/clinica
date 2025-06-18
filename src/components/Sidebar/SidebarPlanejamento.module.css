@@ -1,0 +1,42 @@
+.sidebar {
+  width: 250px;
+  background-color: #f8f8f8;
+  padding: 16px;
+  border-right: 1px solid #ccc;
+  overflow-y: auto;
+}
+
+.select {
+  width: 100%;
+  margin-bottom: 8px;
+  padding: 6px;
+}
+
+.addButton {
+  width: 100%;
+  padding: 8px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  cursor: pointer;
+  margin-bottom: 12px;
+}
+
+.addButton:disabled {
+  background-color: #aaa;
+  cursor: not-allowed;
+}
+
+.cardsArea {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cardSidebar {
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: white;
+}
