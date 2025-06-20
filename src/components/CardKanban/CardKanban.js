@@ -8,6 +8,7 @@ const CardKanban = forwardRef(({
     columns,
     setSelectedCard,
     setShowConnectionsModal,
+    moveCardToColumn, // Adicione esta prop
     ...handlers
 }, ref) => {
     const [showModal, setShowModal] = useState(false);
@@ -21,7 +22,7 @@ const CardKanban = forwardRef(({
             case "agendado":
                 return { color: "success", icon: "✅" };
             case "realizado":
-                return { color: "secondary", icon: "✔️" }; // ⬅️ Novo ícone
+                return { color: "secondary", icon: "✔️" };
             default:
                 return { color: "secondary", icon: "❔" };
         }
@@ -29,49 +30,56 @@ const CardKanban = forwardRef(({
 
     const { icon } = getStatusConfig();
 
+    const handleDragStart = (e) => {
+        e.dataTransfer.setData("text/plain", card.id);
+        e.dataTransfer.setData("currentColumn", card.column);
+        e.currentTarget.style.opacity = "0.4";
+    };
+
+    const handleDragEnd = (e) => {
+        e.currentTarget.style.opacity = "1";
+    };
+
     return (
         <>
             <Card
                 ref={ref}
                 draggable
-                onDragStart={(e) => {
-                    e.dataTransfer.setData("text/plain", card.id);
+                onDragStart={handleDragStart}
+                onDragEnd={handleDragEnd}
+                className={`${styles.cardCompact} ${card.connections?.length > 0 ? styles['card-connected'] : ''} ${styles['card-has-connections']}`}
+                onClick={() => handlers.setSelectedCardDetalhe(card)}
+                onContextMenu={(e) => {
+                    e.preventDefault();
+                    handlers.setSelectedCard(card);
+                    handlers.setShowConnectionsModal(true);
                 }}
-            className={`${styles.cardCompact} ${card.connections?.length > 0 ? styles['card-connected'] : ''} ${styles['card-has-connections']}`}
-            onClick={() => handlers.setSelectedCardDetalhe(card)}
-            onContextMenu={(e) => {
-                e.preventDefault();
-                handlers.setSelectedCard(card);
-                handlers.setShowConnectionsModal(true);
-            }}
-            style={{ cursor: "pointer", position: "relative" }}
+                style={{ cursor: "pointer", position: "relative" }}
             >
-            <Card.Body>
-                <p><strong>Paciente:</strong> {card.content.paciente}</p>
-                <p><strong>Procedimento:</strong> {card.content.procedimento}</p>
+                <Card.Body>
+                    <p><strong>Paciente:</strong> {card.content.paciente}</p>
+                    <p><strong>Procedimento:</strong> {card.content.procedimento}</p>
 
-                <div
-                    className={`${styles.statusBadge} ${status === "agendar" ? styles.statusAgendar
-                        : status === "agendado" ? styles.statusAgendado
-                            : status === "realizado" ? styles.statusRealizado
-                                : ""
-                        }`}
-                >
-                    {icon}
-                </div>
-            </Card.Body>
-        </Card >
+                    <div
+                        className={`${styles.statusBadge} ${status === "agendar" ? styles.statusAgendar
+                            : status === "agendado" ? styles.statusAgendado
+                                : status === "realizado" ? styles.statusRealizado
+                                    : ""
+                            }`}
+                    >
+                        {icon}
+                    </div>
+                </Card.Body>
+            </Card>
 
-
-            { showModal && (
+            {showModal && (
                 <CardDetalhadoModal
                     card={card}
                     columns={columns}
                     onClose={() => setShowModal(false)}
                     {...handlers}
                 />
-            )
-}
+            )}
         </>
     );
 });

@@ -1,7 +1,7 @@
 import React from "react";
 import styles from "../../paginas/Home.module.css";
 import CardKanban from "../CardKanban/CardKanban";
-import CardPlanejamento from "../CardPlanejamento/CardPlanejamento";
+
 
 const Column = ({
   column,
@@ -19,10 +19,12 @@ const Column = ({
   cardsSidebar,
   setCardsSidebar,
   setSelectedCardDetalhe,
+  moveCardToColumn,
   ...handlers
 }) => {
   const handleDragOver = (e) => {
-    if (isPlanejamento) e.preventDefault();
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
   };
 
   const handleDrop = (e) => {
@@ -51,7 +53,7 @@ const Column = ({
     if (setCardsSidebar) {
       setCardsSidebar(prev => prev.filter(c => c.id !== card.id));
     }
-  };
+  };  
 
   const handleDragStart = (e, card) => {
     if (isPlanejamento) {
@@ -106,9 +108,10 @@ const Column = ({
             card={card}
             columns={columns}
             cardRefs={cardRefs}
-            setSelectedCard={setSelectedCardDetalhe} 
+            setSelectedCard={setSelectedCardDetalhe}
             setShowConnectionsModal={setShowConnectionsModal}
             setSelectedCardDetalhe={setSelectedCardDetalhe}
+            moveCardToColumn={moveCardToColumn}
             {...handlers}
           />
         ))}
