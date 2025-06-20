@@ -33,45 +33,45 @@ const CardKanban = forwardRef(({
         <>
             <Card
                 ref={ref}
-                className={`${styles.cardCompact} ${card.connections?.length > 0 ? styles['card-connected'] : ''
-                    } ${styles['card-has-connections']}`}
-                onClick={() => setShowModal(true)}
-                onContextMenu={(e) => {
-                    e.preventDefault();
-                    setSelectedCard(card);
-                    setShowConnectionsModal(true);
+                draggable
+                onDragStart={(e) => {
+                    e.dataTransfer.setData("text/plain", card.id);
                 }}
-                style={{ cursor: "pointer", position: "relative" }}
+            className={`${styles.cardCompact} ${card.connections?.length > 0 ? styles['card-connected'] : ''} ${styles['card-has-connections']}`}
+            onClick={() => handlers.setSelectedCardDetalhe(card)}
+            onContextMenu={(e) => {
+                e.preventDefault();
+                handlers.setSelectedCard(card);
+                handlers.setShowConnectionsModal(true);
+            }}
+            style={{ cursor: "pointer", position: "relative" }}
             >
-                <Card.Body>
-                    <p><strong>Paciente:</strong> {card.content.paciente}</p>
-                    <p><strong>Procedimento:</strong> {card.content.procedimento}</p>
+            <Card.Body>
+                <p><strong>Paciente:</strong> {card.content.paciente}</p>
+                <p><strong>Procedimento:</strong> {card.content.procedimento}</p>
 
-                    {/* Botão de status flutuante */}
-                    <div
-                        className={`${styles.statusBadge} ${status === "agendar"
-                                ? styles.statusAgendar
-                                : status === "agendado"
-                                    ? styles.statusAgendado
-                                    : status === "realizado"
-                                        ? styles.statusRealizado
-                                        : ""
-                            }`}
-                    >
-                        {icon}
-                    </div>
+                <div
+                    className={`${styles.statusBadge} ${status === "agendar" ? styles.statusAgendar
+                        : status === "agendado" ? styles.statusAgendado
+                            : status === "realizado" ? styles.statusRealizado
+                                : ""
+                        }`}
+                >
+                    {icon}
+                </div>
+            </Card.Body>
+        </Card >
 
-                </Card.Body>
-            </Card>
 
-            {showModal && (
+            { showModal && (
                 <CardDetalhadoModal
                     card={card}
                     columns={columns}
                     onClose={() => setShowModal(false)}
                     {...handlers}
                 />
-            )}
+            )
+}
         </>
     );
 });

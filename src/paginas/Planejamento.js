@@ -8,11 +8,11 @@ import CardDetalhadoModal from "../components/CardDetalhadoModal/CardDetalhadoMo
 import { useLocation, useNavigate } from "react-router-dom";
 
 const colunasFixas = [
-  { id: "col1", title: "Etapa 1", color: "#f5f5f5" },
-  { id: "col2", title: "Etapa 2", color: "#f5f5f5" },
-  { id: "col3", title: "Etapa 3", color: "#f5f5f5" },
-  { id: "col4", title: "Etapa 4", color: "#f5f5f5" },
-  { id: "col5", title: "Etapa 5", color: "#f5f5f5" },
+  { id: "col1", title: "Etapa 1", color: "#000000" },
+  { id: "col2", title: "Etapa 2", color: "#000000" },
+  { id: "col3", title: "Etapa 3", color: "#000000" },
+  { id: "col4", title: "Etapa 4", color: "#000000" },
+  { id: "col5", title: "Etapa 5", color: "#000000" },
 ];
 
 const Planejamento = () => {
@@ -34,7 +34,6 @@ const Planejamento = () => {
     if (!paciente) navigate("/");
   }, [paciente, navigate]);
 
-  // Atualizar posições dos cards
   const updateCardPositions = useCallback(() => {
     if (!columnsContainerRef.current || !svgRef.current) return;
 
@@ -117,6 +116,71 @@ const Planejamento = () => {
     });
   };
 
+  // ✅ Função local para atualizar o status de agendamento
+  const toggleAgendamentoStatusPlanejamento = (cardId, novoStatus) => {
+    setCardsDistribuidos((prev) => {
+      const novo = { ...prev };
+      Object.keys(novo).forEach((colunaId) => {
+        novo[colunaId] = novo[colunaId].map((card) =>
+          card.id === cardId
+            ? {
+              ...card,
+              content: {
+                ...card.content,
+                agendamento: {
+                  ...card.content.agendamento,
+                  status: novoStatus,
+                },
+              },
+            }
+            : card
+        );
+      });
+      return novo;
+    });
+
+    // ✅ Atualiza também o card que está aberto no modal
+    setSelectedCardDetalhe((prev) =>
+      prev && prev.id === cardId
+        ? {
+          ...prev,
+          content: {
+            ...prev.content,
+            agendamento: {
+              ...prev.content.agendamento,
+              status: novoStatus,
+            },
+          },
+        }
+        : prev
+    );
+  };
+
+  const moveCardToColumn = (cardId, targetColumnId) => {
+    setCardsDistribuidos((prev) => {
+      const novo = { ...prev };
+      let movedCard = null;
+
+      // Remove o card de todas as colunas
+      Object.keys(novo).forEach((colunaId) => {
+        novo[colunaId] = novo[colunaId].filter((card) => {
+          if (card.id === cardId) {
+            movedCard = { ...card, column: targetColumnId };
+            return false;
+          }
+          return true;
+        });
+      });
+
+      // Adiciona o card na nova coluna
+      if (movedCard) {
+        novo[targetColumnId] = [...(novo[targetColumnId] || []), movedCard];
+      }
+
+      return novo;
+    });
+  };
+  
   return (
     <div className={styles.planejamentoContainer}>
       <TopbarPlanejamento paciente={paciente} />
@@ -132,9 +196,9 @@ const Planejamento = () => {
         <div className={styles.colunasArea} ref={columnsContainerRef}>
           {/* Conexões SVG */}
           <svg ref={svgRef} className={styles.connectionSvg}>
-            {Object.keys(cardsDistribuidos).flatMap((colunaId) => {
-              return (cardsDistribuidos[colunaId] || []).flatMap((card) => {
-                return (card.connections || []).map((connectedCardId) => {
+            {Object.keys(cardsDistribuidos).flatMap((colunaId) =>
+              (cardsDistribuidos[colunaId] || []).flatMap((card) =>
+                (card.connections || []).map((connectedCardId) => {
                   const start = cardPositions[card.id];
                   const end = cardPositions[connectedCardId];
                   if (start && end) {
@@ -150,9 +214,9 @@ const Planejamento = () => {
                     );
                   }
                   return null;
-                });
-              });
-            })}
+                })
+              )
+            )}
           </svg>
 
           {/* Colunas */}
@@ -169,37 +233,27 @@ const Planejamento = () => {
               setSelectedCardDetalhe={setSelectedCardDetalhe}
               setSelectedCard={setSelectedCard}
               setShowConnectionsModal={setShowConnectionsModal}
+              moveCardToColumn={moveCardToColumn}
             />
           ))}
         </div>
       </div>
 
-      {/* Modal de Detalhe */}
+      {/* Modal Detalhado */}
       {selectedCardDetalhe && (
         <CardDetalhadoModal
-          card={{
-            id: selectedCardDetalhe.id,
-            content: {
-              pacienteId: paciente?.PatientId,
-              paciente: selectedCardDetalhe.paciente,
-              procedimento: selectedCardDetalhe.procedimento,
-              etapas: [],
-              agendamento: { status: "" },
-              saldo: 0,
-              status: "",
-            },
-          }}
+          card={selectedCardDetalhe}
+          columns={colunasFixas}
           onClose={() => setSelectedCardDetalhe(null)}
           toggleEtapa={() => { }}
           handleAgendar={() => { }}
           handleColumnChange={() => { }}
           deleteCard={() => { }}
-          columns={colunasFixas}
-          toggleAgendamentoStatus={() => { }}
+          toggleAgendamentoStatus={toggleAgendamentoStatusPlanejamento}  // ✅ Aqui
         />
       )}
 
-      {/* Modal de Conexões */}
+      {/* Modal Conexões */}
       <ModalConnections
         show={showConnectionsModal}
         onHide={() => setShowConnectionsModal(false)}

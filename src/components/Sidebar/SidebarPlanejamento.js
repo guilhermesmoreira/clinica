@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import styles from "./SidebarPlanejamento.module.css";
 
-const SidebarPlanejamento = ({ paciente, cardsSidebar, setCardsSidebar }) => {
+const SidebarPlanejamento = ({ paciente, cardsSidebar, setCardsSidebar, setCardsDistribuidos }) => {
   const [procedimentos, setProcedimentos] = useState([]);
   const [procedimentoSelecionado, setProcedimentoSelecionado] = useState("");
 
@@ -11,11 +11,11 @@ const SidebarPlanejamento = ({ paciente, cardsSidebar, setCardsSidebar }) => {
         const response = await fetch("http://localhost:8000/procedimentos");
         const data = await response.json();
 
-        if (data && typeof data === 'object') {
+        if (data && typeof data === "object") {
           const todosProcedimentos = Object.values(data).flat();
           setProcedimentos(todosProcedimentos);
         } else {
-          console.error("Formato inesperado:", data);
+          console.error("Formato inesperado de dados:", data);
           setProcedimentos([]);
         }
       } catch (error) {
@@ -39,12 +39,13 @@ const SidebarPlanejamento = ({ paciente, cardsSidebar, setCardsSidebar }) => {
         etapas: [],
         agendamento: { status: "" },
         saldo: 0,
-        status: ""
+        status: "",
       },
-      column: ""
+      connections: [],
+      column: "", // será definido quando o card for para uma coluna
     };
 
-    setCardsSidebar(prev => [...prev, novoCard]);
+    setCardsSidebar((prev) => [...prev, novoCard]);
     setProcedimentoSelecionado("");
   };
 
@@ -73,7 +74,7 @@ const SidebarPlanejamento = ({ paciente, cardsSidebar, setCardsSidebar }) => {
       </button>
 
       <div className={styles.cardsArea}>
-        {cardsSidebar.map(card => (
+        {cardsSidebar.map((card) => (
           <div
             key={card.id}
             className={styles.cardSidebar}

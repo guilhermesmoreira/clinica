@@ -1,6 +1,7 @@
 import React from "react";
 import styles from "../../paginas/Home.module.css";
 import CardKanban from "../CardKanban/CardKanban";
+import CardPlanejamento from "../CardPlanejamento/CardPlanejamento";
 
 const Column = ({
   column,
@@ -20,7 +21,6 @@ const Column = ({
   setSelectedCardDetalhe,
   ...handlers
 }) => {
-
   const handleDragOver = (e) => {
     if (isPlanejamento) e.preventDefault();
   };
@@ -37,12 +37,11 @@ const Column = ({
     setCardsDistribuidos(prev => {
       const novoDistribuido = { ...prev };
 
-      // Remove de outras colunas
+      // Remove o card de todas as colunas antes de adicionar na nova
       Object.keys(novoDistribuido).forEach(col => {
         novoDistribuido[col] = novoDistribuido[col].filter(c => c.id !== card.id);
       });
 
-      // Adiciona nesta coluna
       if (!novoDistribuido[columnId]) novoDistribuido[columnId] = [];
       novoDistribuido[columnId].push(card);
 
@@ -73,7 +72,8 @@ const Column = ({
             type="text"
             value={column.title}
             onChange={(e) => editColumnTitle(column.id, e.target.value)}
-            className={`${styles.columnTitleInput} ${column.color?.includes("#000000") ? styles.whiteText : ""}`}
+            className={`${styles.columnTitleInput} ${column.color?.includes("#000000") ? styles.whiteText : ""
+              }`}
           />
         )}
 
@@ -101,28 +101,16 @@ const Column = ({
 
       <div className={styles.cards}>
         {cards.map((card) => (
-          isPlanejamento ? (
-            <div
-              key={card.id}
-              className={styles.card}
-              draggable
-              onDragStart={(e) => handleDragStart(e, card)}
-              onClick={() => setSelectedCardDetalhe && setSelectedCardDetalhe(card)}
-            >
-              <p><strong>Paciente:</strong> {card.content.paciente}</p>
-              <p><strong>Procedimento:</strong> {card.content.procedimento}</p>
-            </div>
-          ) : (
-            <CardKanban
-              key={card.id}
-              card={card}
-              columns={columns}
-              cardRefs={cardRefs}
-              setSelectedCard={setSelectedCard}
-              setShowConnectionsModal={setShowConnectionsModal}
-              {...handlers}
-            />
-          )
+          <CardKanban
+            key={card.id}
+            card={card}
+            columns={columns}
+            cardRefs={cardRefs}
+            setSelectedCard={setSelectedCardDetalhe} 
+            setShowConnectionsModal={setShowConnectionsModal}
+            setSelectedCardDetalhe={setSelectedCardDetalhe}
+            {...handlers}
+          />
         ))}
       </div>
     </div>
