@@ -3,6 +3,7 @@ import { Card } from "react-bootstrap";
 import CardDetalhadoModal from "../CardDetalhadoModal/CardDetalhadoModal";
 import styles from "../../paginas/Home.module.css";
 
+
 const CardKanban = forwardRef(({
     card,
     columns,
@@ -52,6 +53,7 @@ const CardKanban = forwardRef(({
                 onContextMenu={(e) => {
                     e.preventDefault();
                     handlers.setSelectedCard(card);
+                    
                     handlers.setShowConnectionsModal(true);
                 }}
                 style={{ cursor: "pointer", position: "relative" }}
