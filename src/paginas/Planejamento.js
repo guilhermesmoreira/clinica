@@ -234,6 +234,7 @@ const Planejamento = () => {
               setSelectedCard={setSelectedCard}
               setShowConnectionsModal={setShowConnectionsModal}
               moveCardToColumn={moveCardToColumn}
+              toggleAgendamentoStatus={toggleAgendamentoStatusPlanejamento}
             />
           ))}
         </div>
@@ -249,7 +250,7 @@ const Planejamento = () => {
           handleAgendar={() => { }}
           handleColumnChange={() => { }}
           deleteCard={() => { }}
-          toggleAgendamentoStatus={toggleAgendamentoStatusPlanejamento}  // ✅ Aqui
+          toggleAgendamentoStatus={toggleAgendamentoStatusPlanejamento} 
         />
       )}
 

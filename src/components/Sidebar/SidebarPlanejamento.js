@@ -43,6 +43,10 @@ const SidebarPlanejamento = ({ paciente, cardsSidebar, setCardsSidebar }) => {
                 pacienteId: paciente.PatientId,
                 paciente: paciente.Name,
                 procedimento: procedimentoPrincipal,
+                etapas: [],                  // <-- aqui
+                agendamento: { status: "" }, // <-- aqui
+                saldo: 0,                    // <-- aqui
+                status: "",
               },
               connections: [],
               column: "",

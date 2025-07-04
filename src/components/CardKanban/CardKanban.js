@@ -3,18 +3,18 @@ import { Card } from "react-bootstrap";
 import CardDetalhadoModal from "../CardDetalhadoModal/CardDetalhadoModal";
 import styles from "../../paginas/Home.module.css";
 
-
 const CardKanban = forwardRef(({
     card,
     columns,
     setSelectedCard,
     setShowConnectionsModal,
-    moveCardToColumn, // Adicione esta prop
+    setSelectedCardDetalhe,
+    toggleAgendamentoStatus,
     ...handlers
 }, ref) => {
     const [showModal, setShowModal] = useState(false);
 
-    const status = card.content.agendamento?.status;
+    const status = card.content.agendamento?.status || "";
 
     const getStatusConfig = () => {
         switch (status) {
@@ -32,8 +32,7 @@ const CardKanban = forwardRef(({
     const { icon } = getStatusConfig();
 
     const handleDragStart = (e) => {
-        e.dataTransfer.setData("text/plain", card.id);
-        e.dataTransfer.setData("currentColumn", card.column);
+        e.dataTransfer.setData("text/plain", JSON.stringify(card));
         e.currentTarget.style.opacity = "0.4";
     };
 
@@ -48,20 +47,18 @@ const CardKanban = forwardRef(({
                 draggable
                 onDragStart={handleDragStart}
                 onDragEnd={handleDragEnd}
-                className={`${styles.cardCompact} ${card.connections?.length > 0 ? styles['card-connected'] : ''} ${styles['card-has-connections']}`}
-                onClick={() => handlers.setSelectedCardDetalhe(card)}
+                className={`${styles.cardCompact} ${card.connections?.length > 0 ? styles['card-connected'] : ''}`}
+                onClick={() => setShowModal(true)}
                 onContextMenu={(e) => {
                     e.preventDefault();
-                    handlers.setSelectedCard(card);
-                    
-                    handlers.setShowConnectionsModal(true);
+                    setSelectedCard(card);
+                    setShowConnectionsModal(true);
                 }}
                 style={{ cursor: "pointer", position: "relative" }}
             >
                 <Card.Body>
                     <p><strong>Paciente:</strong> {card.content.paciente}</p>
                     <p><strong>Procedimento:</strong> {card.content.procedimento}</p>
-
                     <div
                         className={`${styles.statusBadge} ${status === "agendar" ? styles.statusAgendar
                             : status === "agendado" ? styles.statusAgendado
@@ -75,10 +72,12 @@ const CardKanban = forwardRef(({
             </Card>
 
             {showModal && (
+                
                 <CardDetalhadoModal
                     card={card}
                     columns={columns}
                     onClose={() => setShowModal(false)}
+                    toggleAgendamentoStatus={handlers.toggleAgendamentoStatus}
                     {...handlers}
                 />
             )}

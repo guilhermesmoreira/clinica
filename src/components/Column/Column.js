@@ -19,7 +19,8 @@ const Column = ({
   cardsSidebar,
   setCardsSidebar,
   setSelectedCardDetalhe,
-  moveCardToColumn,
+  moveCardToColumn,  
+  toggleAgendamentoStatus,
   ...handlers
 }) => {
   const handleDragOver = (e) => {
@@ -29,37 +30,36 @@ const Column = ({
 
   const handleDrop = (e) => {
     if (!isPlanejamento) return;
-
     e.preventDefault();
     const cardJson = e.dataTransfer.getData("text/plain");
     if (!cardJson) return;
-
     const card = JSON.parse(cardJson);
 
-    setCardsDistribuidos(prev => {
+    setCardsDistribuidos((prev) => {
       const novoDistribuido = { ...prev };
 
-      // Remove o card de todas as colunas antes de adicionar na nova
-      Object.keys(novoDistribuido).forEach(col => {
-        novoDistribuido[col] = novoDistribuido[col].filter(c => c.id !== card.id);
+      // Remove o card de todas as colunas
+      Object.keys(novoDistribuido).forEach((col) => {
+        novoDistribuido[col] = novoDistribuido[col].filter((c) => c.id !== card.id);
       });
 
+      // Adiciona na nova coluna
       if (!novoDistribuido[columnId]) novoDistribuido[columnId] = [];
-      novoDistribuido[columnId].push(card);
+      novoDistribuido[columnId].push({ ...card, column: columnId });
 
       return novoDistribuido;
     });
 
     if (setCardsSidebar) {
-      setCardsSidebar(prev => prev.filter(c => c.id !== card.id));
+      setCardsSidebar((prev) => prev.filter((c) => c.id !== card.id));
     }
-  };  
-
+  };
+  
   const handleDragStart = (e, card) => {
     if (isPlanejamento) {
       e.dataTransfer.setData("text/plain", JSON.stringify(card));
     }
-  };
+  };  
 
   return (
     <div
@@ -111,7 +111,8 @@ const Column = ({
             setSelectedCard={setSelectedCardDetalhe}
             setShowConnectionsModal={setShowConnectionsModal}
             setSelectedCardDetalhe={setSelectedCardDetalhe}
-            moveCardToColumn={moveCardToColumn}
+            moveCardToColumn={moveCardToColumn} 
+            toggleAgendamentoStatus={toggleAgendamentoStatus}           
             {...handlers}
           />
         ))}
