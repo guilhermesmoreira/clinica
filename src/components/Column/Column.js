@@ -2,7 +2,6 @@ import React from "react";
 import styles from "../../paginas/Home.module.css";
 import CardKanban from "../CardKanban/CardKanban";
 
-
 const Column = ({
   column,
   cards = [],
@@ -19,8 +18,10 @@ const Column = ({
   cardsSidebar,
   setCardsSidebar,
   setSelectedCardDetalhe,
-  moveCardToColumn,  
+  moveCardToColumn,
   toggleAgendamentoStatus,
+  onStartConnection,
+  onEndConnection,
   ...handlers
 }) => {
   const handleDragOver = (e) => {
@@ -30,9 +31,11 @@ const Column = ({
 
   const handleDrop = (e) => {
     if (!isPlanejamento) return;
+
     e.preventDefault();
     const cardJson = e.dataTransfer.getData("text/plain");
     if (!cardJson) return;
+
     const card = JSON.parse(cardJson);
 
     setCardsDistribuidos((prev) => {
@@ -54,12 +57,6 @@ const Column = ({
       setCardsSidebar((prev) => prev.filter((c) => c.id !== card.id));
     }
   };
-  
-  const handleDragStart = (e, card) => {
-    if (isPlanejamento) {
-      e.dataTransfer.setData("text/plain", JSON.stringify(card));
-    }
-  };  
 
   return (
     <div
@@ -74,8 +71,9 @@ const Column = ({
             type="text"
             value={column.title}
             onChange={(e) => editColumnTitle(column.id, e.target.value)}
-            className={`${styles.columnTitleInput} ${column.color?.includes("#000000") ? styles.whiteText : ""
-              }`}
+            className={`${styles.columnTitleInput} ${
+              column.color?.includes("#000000") ? styles.whiteText : ""
+            }`}
           />
         )}
 
@@ -111,8 +109,10 @@ const Column = ({
             setSelectedCard={setSelectedCardDetalhe}
             setShowConnectionsModal={setShowConnectionsModal}
             setSelectedCardDetalhe={setSelectedCardDetalhe}
-            moveCardToColumn={moveCardToColumn} 
-            toggleAgendamentoStatus={toggleAgendamentoStatus}           
+            moveCardToColumn={moveCardToColumn}
+            toggleAgendamentoStatus={toggleAgendamentoStatus}
+            onStartConnection={onStartConnection}
+            onEndConnection={onEndConnection}
             {...handlers}
           />
         ))}

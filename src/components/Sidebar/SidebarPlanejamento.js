@@ -7,13 +7,13 @@ const SidebarPlanejamento = ({ paciente, cardsSidebar, setCardsSidebar }) => {
       if (!paciente) return;
 
       try {
-        // ✅ Intervalo de 30 dias
+        // ✅ Intervalo de hoje até 30 dias à frente
         const hoje = new Date();
-        const trintaDiasAtras = new Date();
-        trintaDiasAtras.setDate(hoje.getDate() - 30);
+        const trintaDiasDepois = new Date();
+        trintaDiasDepois.setDate(hoje.getDate() + 30);
 
-        const from = trintaDiasAtras.toISOString().split("T")[0];
-        const to = hoje.toISOString().split("T")[0];
+        const from = hoje.toISOString().split("T")[0];
+        const to = trintaDiasDepois.toISOString().split("T")[0];
 
         // ✅ Busca orçamentos
         const response = await fetch(
@@ -26,34 +26,34 @@ const SidebarPlanejamento = ({ paciente, cardsSidebar, setCardsSidebar }) => {
             (item) => item.PatientId === paciente.PatientId
           );
 
-          const cardsPromises = orcamentosPaciente.map(async (orc) => {
+          // ✅ Agora cria um card para cada procedimento (não apenas o primeiro)
+          const cardsPromises = orcamentosPaciente.flatMap(async (orc) => {
             const detalhesResp = await fetch(
               `http://localhost:8000/orcamento_detalhe?treatment_id=${orc.TreatmentId}`
             );
             const detalhes = await detalhesResp.json();
 
-            const procedimentoPrincipal =
-              detalhes.ProcedureList && detalhes.ProcedureList.length > 0
-                ? detalhes.ProcedureList[0].OperationDescription || "Procedimento não informado"
-                : "Sem procedimentos";
-
-            return {
-              id: orc.id,
-              content: {
-                pacienteId: paciente.PatientId,
-                paciente: paciente.Name,
-                procedimento: procedimentoPrincipal,
-                etapas: [],                  // <-- aqui
-                agendamento: { status: "" }, // <-- aqui
-                saldo: 0,                    // <-- aqui
-                status: "",
-              },
-              connections: [],
-              column: "",
-            };
+            if (Array.isArray(detalhes.ProcedureList)) {
+              return detalhes.ProcedureList.map((proc) => ({
+                id: proc.id,  // ID único do procedimento
+                content: {
+                  pacienteId: paciente.PatientId,
+                  paciente: paciente.Name,
+                  procedimento: proc.OperationDescription,
+                  etapas: [],
+                  agendamento: { status: "" },
+                  saldo: 0,
+                  status: "",
+                },
+                connections: [],
+                column: "",
+              }));
+            }
+            return [];
           });
 
-          const novosCards = await Promise.all(cardsPromises);
+          const nestedCards = await Promise.all(cardsPromises);
+          const novosCards = nestedCards.flat();  // Achata o array
           setCardsSidebar(novosCards);
         } else {
           console.error("Formato inesperado:", data);

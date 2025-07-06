@@ -34,8 +34,7 @@ const CardDetalhadoModal = ({
             >
               Remover
             </Button>
-          </div>
-          <p><strong>ID:</strong> {card.content.ID}</p>
+          </div>          
           <p><strong>Paciente:</strong> {card.content.paciente}</p>
           <p><strong>Procedimento:</strong> {card.content.procedimento}</p>
 
@@ -84,25 +83,7 @@ const CardDetalhadoModal = ({
               Realizado
             </div>
           </div>
-
-          <p><strong>Saldo:</strong> {card.content.saldo}</p>
-          <p className={`${styles.status} ${card.content.status}`}>
-            Status: {card.content.status}
-          </p>
-
-          <Form.Group controlId={`formColumn-${card.id}`}>
-            <Form.Label>Coluna</Form.Label>
-            <Form.Select
-              value={card.column}
-              onChange={(e) => handleColumnChange(card.id, e.target.value)}
-            >
-              {columns.map((col) => (
-                <option key={col.id} value={col.id}>
-                  {col.title}
-                </option>
-              ))}
-            </Form.Select>
-          </Form.Group>
+          <p><strong>Saldo:</strong> {card.content.saldo}</p>     
         </Card.Body>
       </Modal.Body>
       <Modal.Footer>

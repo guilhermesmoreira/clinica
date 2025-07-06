@@ -309,3 +309,25 @@
   flex-grow: 1;
   overflow: auto;  
 }
+
+.connectionDotLeft,
+.connectionDotRight {
+  width: 12px;
+  height: 12px;
+  background-color: #3498db;
+  border-radius: 50%;
+  position: absolute;
+  cursor: grab;
+}
+
+.connectionDotLeft {
+  left: -6px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.connectionDotRight {
+  right: -6px;
+  top: 50%;
+  transform: translateY(-50%);
+}

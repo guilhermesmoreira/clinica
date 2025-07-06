@@ -26,6 +26,7 @@ const Planejamento = () => {
   const [cardPositions, setCardPositions] = useState({});
   const [showConnectionsModal, setShowConnectionsModal] = useState(false);
   const [selectedCard, setSelectedCard] = useState(null);
+  const [connectionStart, setConnectionStart] = useState(null);
 
   const svgRef = useRef(null);
   const columnsContainerRef = useRef(null);
@@ -180,7 +181,18 @@ const Planejamento = () => {
       return novo;
     });
   };
-  
+
+  const handleStartConnection = (cardId) => {
+    setConnectionStart(cardId);
+  };
+
+  const handleEndConnection = (targetCardId) => {
+    if (connectionStart && connectionStart !== targetCardId) {
+      addConnection(connectionStart, targetCardId);
+    }
+    setConnectionStart(null);
+  };
+
   return (
     <div className={styles.planejamentoContainer}>
       <TopbarPlanejamento paciente={paciente} />
@@ -235,11 +247,13 @@ const Planejamento = () => {
               setShowConnectionsModal={setShowConnectionsModal}
               moveCardToColumn={moveCardToColumn}
               toggleAgendamentoStatus={toggleAgendamentoStatusPlanejamento}
+              onStartConnection={handleStartConnection}
+              onEndConnection={handleEndConnection}
             />
           ))}
         </div>
       </div>
-
+      
       {/* Modal Detalhado */}
       {selectedCardDetalhe && (
         <CardDetalhadoModal
@@ -250,10 +264,9 @@ const Planejamento = () => {
           handleAgendar={() => { }}
           handleColumnChange={() => { }}
           deleteCard={() => { }}
-          toggleAgendamentoStatus={toggleAgendamentoStatusPlanejamento} 
+          toggleAgendamentoStatus={toggleAgendamentoStatusPlanejamento}
         />
       )}
-
       {/* Modal Conexões */}
       <ModalConnections
         show={showConnectionsModal}
