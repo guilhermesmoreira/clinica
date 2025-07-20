@@ -1,79 +1,86 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import styles from "./SidebarPlanejamento.module.css";
 
 const SidebarPlanejamento = ({ paciente, cardsSidebar, setCardsSidebar }) => {
-  const [procedimentos, setProcedimentos] = useState([]);
-  const [procedimentoSelecionado, setProcedimentoSelecionado] = useState("");
-
   useEffect(() => {
-    const fetchProcedimentos = async () => {
+    const fetchOrcamentos = async () => {
+      if (!paciente) return;
+
       try {
-        const response = await fetch("http://localhost:8000/procedimentos");
+        // ✅ Intervalo de hoje até 30 dias à frente
+        // const hoje = new Date();
+        // const trintaDiasDepois = new Date();
+        // trintaDiasDepois.setDate(hoje.getDate() + 30);
+
+        // const from = hoje.toISOString().split("T")[0];
+        // const to = trintaDiasDepois.toISOString().split("T")[0];
+
+        // ✅ Datas fixas
+        const from = "2025-07-01";
+        const to = "2025-07-30";
+
+        // ✅ Busca orçamentos
+        const response = await fetch(
+          `http://localhost:8000/orcamentos?from=${from}&to=${to}`
+        );
         const data = await response.json();
 
-        if (data && typeof data === 'object') {
-          const todosProcedimentos = Object.values(data).flat();
-          setProcedimentos(todosProcedimentos);
+        if (Array.isArray(data)) {
+          const orcamentosPaciente = data.filter(
+            (item) => item.PatientId === paciente.PatientId
+          );
+
+          // ✅ Agora cria um card para cada procedimento (não apenas o primeiro)
+          const cardsPromises = orcamentosPaciente.flatMap(async (orc) => {
+            const detalhesResp = await fetch(
+              `http://localhost:8000/orcamento_detalhe?treatment_id=${orc.TreatmentId}`
+            );
+            const detalhes = await detalhesResp.json();
+
+            if (Array.isArray(detalhes.ProcedureList)) {
+              return detalhes.ProcedureList
+                .filter((proc) => {
+                  const dataProc = new Date(proc.CreateDate);
+                  return dataProc >= new Date(from) && dataProc <= new Date(to);
+                })
+                .map((proc) => ({
+                  id: proc.id,
+                  content: {
+                    pacienteId: paciente.PatientId,
+                    paciente: paciente.Name,
+                    procedimento: `${proc.OperationDescription} ${proc.Tooth ? `(Dente ${proc.Tooth})` : ""}`,
+                    etapas: [],
+                    agendamento: { status: "" },
+                    saldo: 0,
+                    status: "",
+                  },
+                  connections: [],
+                  column: "",
+                }));
+            }
+            return [];
+          });
+
+          const nestedCards = await Promise.all(cardsPromises);
+          const novosCards = nestedCards.flat();  // Achata o array
+          setCardsSidebar(novosCards);
         } else {
           console.error("Formato inesperado:", data);
-          setProcedimentos([]);
         }
       } catch (error) {
-        console.error("Erro ao buscar procedimentos:", error);
-        setProcedimentos([]);
+        console.error("Erro ao buscar orçamentos:", error);
       }
     };
 
-    fetchProcedimentos();
-  }, []);
-
-  const handleAdicionarProcedimento = () => {
-    if (!procedimentoSelecionado || !paciente) return;
-
-    const novoCard = {
-      id: Date.now(),
-      content: {
-        pacienteId: paciente.PatientId,
-        paciente: paciente.Name,
-        procedimento: procedimentoSelecionado,
-        etapas: [],
-        agendamento: { status: "" },
-        saldo: 0,
-        status: ""
-      },
-      column: ""
-    };
-
-    setCardsSidebar(prev => [...prev, novoCard]);
-    setProcedimentoSelecionado("");
-  };
+    fetchOrcamentos();
+  }, [paciente]);
 
   return (
     <div className={styles.sidebar}>
-      <h4>Procedimentos</h4>
-      <select
-        className={styles.select}
-        value={procedimentoSelecionado}
-        onChange={(e) => setProcedimentoSelecionado(e.target.value)}
-      >
-        <option value="">Selecione um procedimento</option>
-        {procedimentos.map((proc) => (
-          <option key={proc.id} value={proc.ProcedureName}>
-            {proc.ProcedureName}
-          </option>
-        ))}
-      </select>
-
-      <button
-        className={styles.addButton}
-        onClick={handleAdicionarProcedimento}
-        disabled={!procedimentoSelecionado}
-      >
-        Adicionar procedimento
-      </button>
+      <h4>Orçamento:</h4>
 
       <div className={styles.cardsArea}>
-        {cardsSidebar.map(card => (
+        {cardsSidebar.map((card) => (
           <div
             key={card.id}
             className={styles.cardSidebar}

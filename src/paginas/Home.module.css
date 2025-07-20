@@ -47,27 +47,6 @@
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-}
-
-.column::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: linear-gradient(90deg, #3b82f6, #06b6d4, #10b981);
-  border-radius: 16px 16px 0 0;
-}
-
-.column:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
 }
 
 .columnHeader {
@@ -96,12 +75,6 @@
   padding: 0.5rem;
   border-radius: 8px;
   transition: all 0.2s ease;
-}
-
-.columnTitleInput:focus {
-  outline: none;
-  background: rgba(59, 130, 246, 0.05);
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
 }
 
 .whiteText {
@@ -150,29 +123,6 @@
   font-weight: 600;
 }
 
-.card .etapas {
-  margin: 1rem 0;
-  padding: 1rem;
-  background: rgba(248, 250, 252, 0.8);
-  border-radius: 8px;
-  border-left: 3px solid #3b82f6;
-}
-
-.card .etapas div {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  margin: 0.5rem 0;
-  padding: 0.25rem 0;
-}
-
-.card .etapas input[type="checkbox"] {
-  margin: 0;
-  width: 16px;
-  height: 16px;
-  accent-color: #3b82f6;
-}
-
 .card .status {
   font-weight: 600;
   margin-top: 1rem;
@@ -200,13 +150,6 @@
 .card .status.azul {
   color: #2563eb;
   background: rgba(37, 99, 235, 0.1);
-}
-
-.cardHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
 }
 
 .dateInput {
@@ -246,23 +189,6 @@
   transform: translateY(-2px);
   box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
   background: linear-gradient(135deg, #2563eb 0%, #0891b2 100%);
-}
-
-.deleteButton {
-  padding: 0.5rem 0.75rem;
-  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-  border: none;
-  border-radius: 8px;
-  color: white;
-  font-weight: 500;
-  transition: all 0.2s ease;
-  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
-}
-
-.deleteButton:hover {
-  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
 }
 
 .modalOverlay {
@@ -333,68 +259,6 @@
   box-shadow: 0 6px 16px rgba(100, 116, 139, 0.4);
 }
 
-.cardCompact {
-  margin-bottom: 12px;
-  padding: 1rem;
-  background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
-  border-left: 4px solid #3b82f6;
-  border-radius: 12px;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.06);
-  transition: all 0.3s ease;
-  cursor: pointer;
-  font-size: 0.9rem;
-  margin: 0.5rem 0;
-  border: 1px solid rgba(226, 232, 240, 0.4);
-  position: relative;
-  overflow: hidden;
-}
-
-.cardCompact::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 2px;
-  background: linear-gradient(90deg, #3b82f6, #06b6d4);
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.cardCompact:hover::before {
-  opacity: 1;
-}
-
-.cardCompact:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
-  border-left-color: #06b6d4;
-}
-
-.card-connected {
-  border-left: 4px solid #10b981;
-}
-
-.card-connected::before {
-  background: linear-gradient(90deg, #10b981, #059669) !important;
-}
-
-.card-has-connections {
-  position: relative;
-}
-
-.card-has-connections::after {
-  content: "";
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 12px;
-  height: 12px;
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  border-radius: 50%;
-  box-shadow: 0 2px 6px rgba(16, 185, 129, 0.4);
-}
-
 .connectionSvg {
   position: absolute;
   top: 0;
@@ -460,102 +324,12 @@
   gap: 0.5rem;
 }
 
-.statusBadge {
-  position: absolute;
-  bottom: 8px;
-  right: 12px;
-  border-radius: 50%;
-  padding: 8px;
-  font-size: 14px;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
-  color: white;
-  font-weight: 600;
-  transition: all 0.2s ease;
-}
-
-.statusBadge:hover {
-  transform: scale(1.1);
-}
-
-.statusAgendar {
-  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-}
-
-.statusAgendado {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-}
-
-.statusRealizado {
-  background: linear-gradient(135deg, #64748b 0%, #475569 100%);
-}
-
 .pageBody {
   display: flex;
-  height: calc(100vh - 80px);
+  height: calc(100vh - 60px);
 }
 
 .mainContent {
   flex-grow: 1;
   overflow: auto;
-  background: transparent;
-}
-
-/* Melhorias na tipografia */
-h1, h2, h3, h4, h5, h6 {
-  font-weight: 600;
-  color: #1e293b;
-  letter-spacing: -0.025em;
-}
-
-/* Scrollbar personalizada */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: rgba(226, 232, 240, 0.3);
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb {
-  background: linear-gradient(135deg, #94a3b8 0%, #64748b 100%);
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(135deg, #64748b 0%, #475569 100%);
-}
-
-/* Animações suaves */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.cardCompact {
-  animation: fadeIn 0.3s ease-out;
-}
-
-/* Responsividade */
-@media (max-width: 768px) {
-  .columnsContainer {
-    padding: 0.5rem;
-    gap: 1rem;
-  }
-  
-  .column {
-    width: 280px;
-    padding: 1rem;
-  }
-  
-  .content {
-    padding: 1rem;
-  }
 }

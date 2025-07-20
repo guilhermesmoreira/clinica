@@ -1,6 +1,6 @@
 import React from "react";
 import { Modal, Button, Card, Form } from "react-bootstrap";
-import styles from "../../paginas/Home.module.css";
+import styles from "../CardDetalhadoModal/CardDetalhadoModal.module.css";
 
 const CardDetalhadoModal = ({
   card,
@@ -14,7 +14,7 @@ const CardDetalhadoModal = ({
 }) => {
   if (!card) return null;
 
-  const { content } = card;
+  console.log("deleteCard recebido:", typeof deleteCard);
 
   return (
     <Modal show={true} onHide={onClose} size="lg">
@@ -36,16 +36,14 @@ const CardDetalhadoModal = ({
             >
               Remover
             </Button>
-          </div>
-
-          <p><strong>ID Paciente:</strong> {content?.pacienteId}</p>
-          <p><strong>Paciente:</strong> {content?.paciente}</p>
-          <p><strong>Procedimento:</strong> {content?.procedimento}</p>
+          </div>          
+          <p><strong>Paciente:</strong> {card.content.paciente}</p>
+          <p><strong>Procedimento:</strong> {card.content.procedimento}</p>
 
           <div className={styles.etapas}>
             <strong>Etapas:</strong>
-            {content.etapas && content.etapas.length > 0 ? (
-              content.etapas.map((etapa, index) => (
+            {Array.isArray(card.content.etapas) && card.content.etapas.length > 0 ? (
+              card.content.etapas.map((etapa, index) => (
                 <div key={index}>
                   <input
                     type="checkbox"
@@ -65,7 +63,7 @@ const CardDetalhadoModal = ({
             <div>
               <input
                 type="checkbox"
-                checked={content.agendamento.status === "agendar"}
+                checked={card.content.agendamento?.status === "agendar"}
                 onChange={() => toggleAgendamentoStatus(card.id, "agendar")}
               />
               Agendar
@@ -73,7 +71,7 @@ const CardDetalhadoModal = ({
             <div>
               <input
                 type="checkbox"
-                checked={content.agendamento.status === "agendado"}
+                checked={card.content.agendamento?.status === "agendado"}
                 onChange={() => toggleAgendamentoStatus(card.id, "agendado")}
               />
               Agendado
@@ -81,31 +79,13 @@ const CardDetalhadoModal = ({
             <div>
               <input
                 type="checkbox"
-                checked={content.agendamento.status === "realizado"}
+                checked={card.content.agendamento?.status === "realizado"}
                 onChange={() => toggleAgendamentoStatus(card.id, "realizado")}
               />
               Realizado
             </div>
           </div>
-
-          <p><strong>Saldo:</strong> {content.saldo}</p>
-          <p className={`${styles.status} ${content.status}`}>
-            Status: {content.status}
-          </p>
-
-          <Form.Group controlId={`formColumn-${card.id}`}>
-            <Form.Label>Coluna</Form.Label>
-            <Form.Select
-              value={card.column}
-              onChange={(e) => handleColumnChange(card.id, e.target.value)}
-            >
-              {columns.map((col) => (
-                <option key={col.id} value={col.id}>
-                  {col.title}
-                </option>
-              ))}
-            </Form.Select>
-          </Form.Group>
+          <p><strong>Saldo:</strong> {card.content.saldo}</p>     
         </Card.Body>
       </Modal.Body>
       <Modal.Footer>
