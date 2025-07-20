@@ -14,6 +14,10 @@ const Column = ({
   columns = [],
   setSelectedCard,
   setShowConnectionsModal,
+  isDragging,
+  dragStartCard,
+  startConnection,
+  endConnection,
   ...handlers
 }) => {
   return (
@@ -59,6 +63,10 @@ const Column = ({
               ref={(el) => (cardRefs.current[card.id] = el)}
               setSelectedCard={setSelectedCard}
               setShowConnectionsModal={setShowConnectionsModal}
+              onStartConnection={startConnection}
+              onEndConnection={endConnection}
+              isDragging={isDragging}
+              dragStartCard={dragStartCard}
               {...handlers}
             />
           ))}

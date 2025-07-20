@@ -56,6 +56,10 @@ export default function useProcedimentos() {
     const [nextBatchId, setNextBatchId] = useState(1);
     const [cardPositions, setCardPositions] = useState({});
     const cardRefs = useRef({});
+    const [isDragging, setIsDragging] = useState(false);
+    const [dragStartCard, setDragStartCard] = useState(null);
+    const [dragStartSide, setDragStartSide] = useState(null);
+    const [tempConnection, setTempConnection] = useState(null);
 
     // Fetch procedimentos
     useEffect(() => {
@@ -254,6 +258,52 @@ export default function useProcedimentos() {
         ));
     };
 
+    const startConnection = (cardId, side) => {
+        setIsDragging(true);
+        setDragStartCard(cardId);
+        setDragStartSide(side);
+    };
+
+    const endConnection = (cardId, side) => {
+        if (isDragging && dragStartCard && dragStartCard !== cardId) {
+            // Criar conexão entre os cards
+            const sourceCard = cards.find(c => c.id === dragStartCard);
+            const targetCard = cards.find(c => c.id === cardId);
+            
+            if (sourceCard && targetCard) {
+                // Adicionar conexão ao card de origem
+                setCards(prevCards =>
+                    prevCards.map(card => {
+                        if (card.id === dragStartCard) {
+                            const newConnection = {
+                                targetId: cardId,
+                                sourceSide: dragStartSide,
+                                targetSide: side
+                            };
+                            return {
+                                ...card,
+                                connections: [...(card.connections || []), newConnection]
+                            };
+                        }
+                        return card;
+                    })
+                );
+            }
+        }
+        
+        // Reset drag state
+        setIsDragging(false);
+        setDragStartCard(null);
+        setDragStartSide(null);
+        setTempConnection(null);
+    };
+
+    const cancelConnection = () => {
+        setIsDragging(false);
+        setDragStartCard(null);
+        setDragStartSide(null);
+        setTempConnection(null);
+    };
     return [
         {
             selectedDate,
@@ -270,6 +320,10 @@ export default function useProcedimentos() {
             newCardData,
             procedimentosDisponiveis,
             filtroProcedimento,
+            isDragging,
+            dragStartCard,
+            dragStartSide,
+            tempConnection,
         },
         {
             setSelectedDate,
@@ -298,6 +352,9 @@ export default function useProcedimentos() {
             setCards,
             setCardPositions,
             toggleAgendamentoStatus,
+            startConnection,
+            endConnection,
+            cancelConnection,
         },
     ];
 }
