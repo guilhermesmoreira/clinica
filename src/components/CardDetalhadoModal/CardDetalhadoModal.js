@@ -1,6 +1,6 @@
 import React from "react";
 import { Modal, Button, Card, Form } from "react-bootstrap";
-import styles from "../../paginas/Home.module.css";
+import styles from "../CardDetalhadoModal/CardDetalhadoModal.module.css";
 
 const CardDetalhadoModal = ({
   card,
@@ -13,6 +13,8 @@ const CardDetalhadoModal = ({
   toggleAgendamentoStatus,
 }) => {
   if (!card) return null;
+
+  console.log("deleteCard recebido:", typeof deleteCard);
 
   return (
     <Modal show={true} onHide={onClose} size="lg">

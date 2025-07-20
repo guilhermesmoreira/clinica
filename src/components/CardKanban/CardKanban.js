@@ -1,7 +1,8 @@
 import React, { useState, forwardRef } from "react";
+import PropTypes from "prop-types";
 import { Card } from "react-bootstrap";
+import styles from "./CardKanban.module.css";
 import CardDetalhadoModal from "../CardDetalhadoModal/CardDetalhadoModal";
-import styles from "../../paginas/Home.module.css";
 
 const CardKanban = forwardRef(
   (
@@ -11,17 +12,14 @@ const CardKanban = forwardRef(
       setSelectedCard,
       setShowConnectionsModal,
       setSelectedCardDetalhe,
-      toggleAgendamentoStatus,
       moveCardToColumn,
+      toggleAgendamentoStatus,
       onStartConnection,
       onEndConnection,
-      ...handlers
     },
     ref
   ) => {
     const [showModal, setShowModal] = useState(false);
-    const [isConnecting, setIsConnecting] = useState(false);
-
     const status = card.content.agendamento?.status || "";
 
     const getStatusConfig = () => {
@@ -40,10 +38,6 @@ const CardKanban = forwardRef(
     const { icon } = getStatusConfig();
 
     const handleDragStart = (e) => {
-      if (isConnecting) {
-        e.preventDefault();
-        return;
-      }
       e.dataTransfer.setData("text/plain", JSON.stringify(card));
       e.currentTarget.style.opacity = "0.4";
     };
@@ -55,9 +49,9 @@ const CardKanban = forwardRef(
     return (
       <>
         <Card
-          id={`card-${card.id}`}
           ref={ref}
-          draggable={!isConnecting}
+          id={`card-${card.id}`}
+          draggable
           onDragStart={handleDragStart}
           onDragEnd={handleDragEnd}
           className={`${styles.cardCompact} ${
@@ -66,28 +60,31 @@ const CardKanban = forwardRef(
           onClick={() => setShowModal(true)}
           style={{ cursor: "pointer", position: "relative" }}
         >
-          <div className={styles.connectionDotLeft}
-            draggable
-            onDragStart={(e) => {
+          {/* 🔵 Bolinha esquerda */}
+          <div
+            id={`dot-${card.id}-left`}
+            data-dot
+            data-card-id={card.id}
+            data-side="left"
+            className={styles.connectionDotLeft}
+            onMouseDown={(e) => {
               e.stopPropagation();
-              e.dataTransfer.setData("text/plain", card.id);
-              setIsConnecting(true);
-              onStartConnection(card.id);
+              onStartConnection(card.id, "left", e);
             }}
-            onDragEnd={() => setIsConnecting(false)}
-          ></div>
+          />
 
-          <div className={styles.connectionDotRight}
-            onDragOver={(e) => e.preventDefault()}
-            onDrop={(e) => {
-              e.preventDefault();
+          {/* 🟢 Bolinha direita */}
+          <div
+            id={`dot-${card.id}-right`}
+            data-dot
+            data-card-id={card.id}
+            data-side="right"
+            className={styles.connectionDotRight}
+            onMouseDown={(e) => {
               e.stopPropagation();
-              const fromCardId = e.dataTransfer.getData("text/plain");
-              if (fromCardId && fromCardId !== card.id) {
-                onEndConnection(card.id);
-              }
+              onStartConnection(card.id, "right", e);
             }}
-          ></div>
+          />
 
           <Card.Body>
             <p>
@@ -96,7 +93,6 @@ const CardKanban = forwardRef(
             <p>
               <strong>Procedimento:</strong> {card.content.procedimento}
             </p>
-
             <div
               className={`${styles.statusBadge} ${
                 status === "agendar"
@@ -119,12 +115,48 @@ const CardKanban = forwardRef(
             columns={columns}
             onClose={() => setShowModal(false)}
             toggleAgendamentoStatus={toggleAgendamentoStatus}
-            {...handlers}
+            moveCardToColumn={moveCardToColumn}
+            setSelectedCard={setSelectedCard}
+            setShowConnectionsModal={setShowConnectionsModal}
+            onEndConnection={onEndConnection}
           />
         )}
       </>
     );
   }
 );
+
+CardKanban.propTypes = {
+  card: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    content: PropTypes.shape({
+      paciente: PropTypes.string,
+      procedimento: PropTypes.string,
+      agendamento: PropTypes.shape({
+        status: PropTypes.string,
+      }),
+    }).isRequired,
+    connections: PropTypes.array,
+  }).isRequired,
+  columns: PropTypes.array,
+  setSelectedCard: PropTypes.func,
+  setShowConnectionsModal: PropTypes.func,
+  setSelectedCardDetalhe: PropTypes.func,
+  moveCardToColumn: PropTypes.func,
+  toggleAgendamentoStatus: PropTypes.func,
+  onStartConnection: PropTypes.func,
+  onEndConnection: PropTypes.func,
+};
+
+CardKanban.defaultProps = {
+  columns: [],
+  setSelectedCard: () => {},
+  setShowConnectionsModal: () => {},
+  setSelectedCardDetalhe: () => {},
+  moveCardToColumn: () => {},
+  toggleAgendamentoStatus: () => {},
+  onStartConnection: () => {},
+  onEndConnection: () => {},
+};
 
 export default CardKanban;

@@ -8,12 +8,16 @@ const SidebarPlanejamento = ({ paciente, cardsSidebar, setCardsSidebar }) => {
 
       try {
         // ✅ Intervalo de hoje até 30 dias à frente
-        const hoje = new Date();
-        const trintaDiasDepois = new Date();
-        trintaDiasDepois.setDate(hoje.getDate() + 30);
+        // const hoje = new Date();
+        // const trintaDiasDepois = new Date();
+        // trintaDiasDepois.setDate(hoje.getDate() + 30);
 
-        const from = hoje.toISOString().split("T")[0];
-        const to = trintaDiasDepois.toISOString().split("T")[0];
+        // const from = hoje.toISOString().split("T")[0];
+        // const to = trintaDiasDepois.toISOString().split("T")[0];
+
+        // ✅ Datas fixas
+        const from = "2025-07-01";
+        const to = "2025-07-30";
 
         // ✅ Busca orçamentos
         const response = await fetch(
@@ -34,20 +38,25 @@ const SidebarPlanejamento = ({ paciente, cardsSidebar, setCardsSidebar }) => {
             const detalhes = await detalhesResp.json();
 
             if (Array.isArray(detalhes.ProcedureList)) {
-              return detalhes.ProcedureList.map((proc) => ({
-                id: proc.id,  // ID único do procedimento
-                content: {
-                  pacienteId: paciente.PatientId,
-                  paciente: paciente.Name,
-                  procedimento: proc.OperationDescription,
-                  etapas: [],
-                  agendamento: { status: "" },
-                  saldo: 0,
-                  status: "",
-                },
-                connections: [],
-                column: "",
-              }));
+              return detalhes.ProcedureList
+                .filter((proc) => {
+                  const dataProc = new Date(proc.CreateDate);
+                  return dataProc >= new Date(from) && dataProc <= new Date(to);
+                })
+                .map((proc) => ({
+                  id: proc.id,
+                  content: {
+                    pacienteId: paciente.PatientId,
+                    paciente: paciente.Name,
+                    procedimento: `${proc.OperationDescription} ${proc.Tooth ? `(Dente ${proc.Tooth})` : ""}`,
+                    etapas: [],
+                    agendamento: { status: "" },
+                    saldo: 0,
+                    status: "",
+                  },
+                  connections: [],
+                  column: "",
+                }));
             }
             return [];
           });

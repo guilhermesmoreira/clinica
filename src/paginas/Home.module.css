@@ -22,7 +22,6 @@
   overflow: visible; /* ⬅️ importante deixar visível */
 }
 
-
 .columns {
   display: flex;
   gap: 1rem;
@@ -41,7 +40,7 @@
   padding: 1rem;
   display: flex;
   flex-direction: column;
-  flex-shrink: 0; 
+  flex-shrink: 0;
 }
 
 .columnHeader {
@@ -52,8 +51,6 @@
   flex-wrap: nowrap;
   overflow: hidden;
 }
-
-
 
 .columnTitleInput {
   border: none;
@@ -67,7 +64,6 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
-
 
 .whiteText {
   color: white !important;
@@ -104,21 +100,6 @@
   color: #000;
 }
 
-.card .etapas {
-  margin: 1rem 0;
-}
-
-.card .etapas div {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin: 0.5rem 0;
-}
-
-.card .etapas input[type="checkbox"] {
-  margin: 0;
-}
-
 .card .status {
   font-weight: bold;
   margin-top: 1rem;
@@ -140,13 +121,6 @@
   color: blue;
 }
 
-.cardHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
-}
-
 .dateInput {
   margin-top: 0.5rem;
   width: 100%;
@@ -154,16 +128,6 @@
 
 .addColumnButton {
   margin-top: 1rem;
-}
-
-.deleteButton {
-  padding: 0.25rem 0.5rem;
-  background-color: #ff4444;
-  border: none;
-}
-
-.deleteButton:hover {
-  background-color: #cc0000;
 }
 
 .modalOverlay {
@@ -224,37 +188,6 @@
   background-color: #cc0000;
 }
 
-.cardCompact {
-  margin-bottom: 10px;
-  padding: 4px;
-  background-color: white;
-  border-left: 6px solid #0d6efd;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
-  transition: all 0.2s ease-in-out;
-  cursor: pointer;
-  font-size: 0.85rem;
-  margin: 0.25rem 0;
-}
-
-.card-connected {
-  border-left: 6px solid #4CAF50;
-}
-
-.card-has-connections {
-  position: relative;
-}
-
-.card-has-connections::after {
-  content: "";
-  position: absolute;
-  top: 5px;
-  right: 5px;
-  width: 10px;
-  height: 10px;
-  background-color: #4CAF50;
-  border-radius: 50%;
-}
-
 .connectionSvg {
   position: absolute;
   top: 0;
@@ -276,58 +209,12 @@
   gap: 0.25rem;
 }
 
-.statusBadge {
-  position: absolute;
-  bottom: 4px;
-  right: 8px;
-  border-radius: 50%;
-  padding: 6px;
-  font-size: 14px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-  color: white;
-}
-
-/* Cores dinâmicas */
-.statusAgendar {
-  background-color: #dc3545; /* vermelho */
-}
-
-.statusAgendado {
-  background-color: #28a745; /* verde */
-}
-
-.statusRealizado {
-  background-color: #6c757d; /* cinza */
-}
-
 .pageBody {
   display: flex;
-  height: calc(100vh - 60px); 
+  height: calc(100vh - 60px);
 }
 
 .mainContent {
   flex-grow: 1;
-  overflow: auto;  
-}
-
-.connectionDotLeft,
-.connectionDotRight {
-  width: 12px;
-  height: 12px;
-  background-color: #3498db;
-  border-radius: 50%;
-  position: absolute;
-  cursor: grab;
-}
-
-.connectionDotLeft {
-  left: -6px;
-  top: 50%;
-  transform: translateY(-50%);
-}
-
-.connectionDotRight {
-  right: -6px;
-  top: 50%;
-  transform: translateY(-50%);
+  overflow: auto;
 }
