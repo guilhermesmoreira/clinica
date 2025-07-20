@@ -120,6 +120,10 @@ const Column = ({
               cardRefs={cardRefs}
               setSelectedCard={setSelectedCard}
               setShowConnectionsModal={setShowConnectionsModal}
+              onStartConnection={startConnection}
+              onEndConnection={endConnection}
+              isDragging={isDragging}
+              dragStartCard={dragStartCard}
               {...handlers}
             />
           )

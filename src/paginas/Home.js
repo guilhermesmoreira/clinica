@@ -134,7 +134,7 @@ const Home = () => {
   const addConnection = (cardId, connectedCardId) => {
     handlers.setCards(prevCards =>
       prevCards.map(card => {
-        if (card.id === cardId && !card.connections?.includes(connectedCardId)) {
+        if (card.id === cardId && !card.connections?.some(conn => conn.targetId === connection.targetId)) {
           return {
             ...card,
             connections: [...(card.connections || []), connectedCardId],
