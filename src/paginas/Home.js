@@ -116,13 +116,13 @@ const Home = () => {
   }, [state.cards, selectedCard]);
 
   // Funções para manipular conexões - Modifique assim:
-  const addConnection = (cardId, connectedCardId) => {
+  const addConnection = (cardId, connection) => {
     handlers.setCards(prevCards =>
       prevCards.map(card => {
-        if (card.id === cardId && !card.connections?.includes(connectedCardId)) {
+        if (card.id === cardId && !card.connections?.some(conn => conn.targetId === connection.targetId)) {
           return {
             ...card,
-            connections: [...(card.connections || []), connectedCardId]
+            connections: [...(card.connections || []), connection]
           };
         }
         return card;
@@ -136,7 +136,7 @@ const Home = () => {
         if (card.id === cardId) {
           return {
             ...card,
-            connections: (card.connections || []).filter(id => id !== connectedCardId)
+            connections: (card.connections || []).filter(conn => conn.targetId !== connectedCardId)
           };
         }
         return card;

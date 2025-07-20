@@ -11,17 +11,25 @@ const ModalConnections = ({
 }) => {
   if (!currentCard) return null;
 
-  const isConnected = (otherId) => {
-    return currentCard.connections?.includes(otherId) || false;
+  const isConnected = (otherCard) => {
+    return currentCard.connections?.some(conn => conn.targetId === otherCard.id) || false;
   };
 
   const toggleConnection = (otherCard) => {
-    const isAlreadyConnected = isConnected(otherCard.id);
+    const isAlreadyConnected = isConnected(otherCard);
 
     if (isAlreadyConnected) {
+      // Remover conexão existente
+      const updatedConnections = currentCard.connections?.filter(conn => conn.targetId !== otherCard.id) || [];
       onRemoveConnection(currentCard.id, otherCard.id);
     } else {
-      onAddConnection(currentCard.id, otherCard.id);
+      // Adicionar nova conexão (padrão: right -> left)
+      const newConnection = {
+        targetId: otherCard.id,
+        sourceSide: 'right',
+        targetSide: 'left'
+      };
+      onAddConnection(currentCard.id, newConnection);
     }
   };
 
@@ -41,7 +49,7 @@ const ModalConnections = ({
               <div key={otherCard.id} className="d-flex align-items-center mb-2">
                 <input
                   type="checkbox"
-                  checked={isConnected(otherCard.id)}
+                  checked={isConnected(otherCard)}
                   onChange={() => toggleConnection(otherCard)}
                   className="me-2"
                 />
